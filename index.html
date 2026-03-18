@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBI Equity Partners — Unit Renovation Toolkit</title>
+<style>
+  :root {
+    --navy: #0d1b2e;
+    --navy-mid: #1a2e47;
+    --orange: #e05c2a;
+    --orange-light: #f07040;
+    --white: #ffffff;
+    --gray-light: #f4f6f9;
+    --gray-mid: #d1d9e0;
+    --gray-text: #6b7a8d;
+    --green: #2a7a4b;
+    --red: #c0392b;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--gray-light); color: #1a1a2e; min-height: 100vh; }
+
+  /* HEADER */
+  .header { background: var(--navy); color: white; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-logo { font-size: 20px; font-weight: 900; letter-spacing: 1px; }
+  .header-logo span { color: var(--orange); }
+  .header-sub { font-size: 11px; color: #8aa0b8; text-transform: uppercase; letter-spacing: 1px; }
+  .header-unit { font-size: 13px; color: var(--orange); font-weight: 600; }
+
+  /* TABS */
+  .tabs { background: var(--navy-mid); display: flex; overflow-x: auto; border-bottom: 2px solid var(--orange); }
+  .tab { padding: 12px 18px; color: #8aa0b8; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tab:hover { color: white; }
+  .tab.active { color: white; border-bottom-color: var(--orange); }
+
+  /* PANELS */
+  .panel { display: none; padding: 16px; max-width: 900px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  /* UNIT INFO BAR */
+  .unit-bar { background: white; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .unit-bar label { font-size: 12px; color: var(--gray-text); font-weight: 600; text-transform: uppercase; }
+  .unit-bar input, .unit-bar select { border: 1px solid var(--gray-mid); border-radius: 6px; padding: 7px 10px; font-size: 14px; color: var(--navy); flex: 1; min-width: 120px; }
+  .unit-bar input:focus, .unit-bar select:focus { outline: none; border-color: var(--orange); }
+  .field-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 130px; }
+
+  /* SECTIONS */
+  .section { background: white; border-radius: 10px; margin-bottom: 14px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .section-header { background: var(--navy); color: white; padding: 12px 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .section-header:hover { background: var(--navy-mid); }
+  .section-header .toggle { font-size: 16px; transition: transform 0.2s; }
+  .section-header.collapsed .toggle { transform: rotate(-90deg); }
+  .section-body { padding: 12px; }
+
+  /* SCOPE ITEMS */
+  .scope-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media(max-width: 600px) { .scope-grid { grid-template-columns: 1fr; } }
+  .scope-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--gray-mid); border-radius: 8px; cursor: pointer; transition: all 0.15s; user-select: none; }
+  .scope-item:hover { border-color: var(--orange); background: #fff7f4; }
+  .scope-item.checked { border-color: var(--orange); background: #fff3ef; }
+  .scope-item.checked .scope-check { background: var(--orange); border-color: var(--orange); color: white; }
+  .scope-check { width: 20px; height: 20px; border: 2px solid var(--gray-mid); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-top: 1px; }
+  .scope-label { font-size: 13px; font-weight: 600; color: var(--navy); line-height: 1.3; }
+  .scope-sub { font-size: 11px; color: var(--gray-text); margin-top: 2px; }
+  .scope-note { width: 100%; margin-top: 6px; border: 1px solid var(--gray-mid); border-radius: 6px; padding: 6px 8px; font-size: 12px; font-family: var(--font); resize: vertical; display: none; }
+  .scope-item.checked .scope-note { display: block; }
+
+  /* OPTIONS WITHIN ITEMS */
+  .scope-options { margin-top: 8px; display: none; }
+  .scope-item.checked .scope-options { display: block; }
+  .scope-options select { width: 100%; border: 1px solid var(--gray-mid); border-radius: 6px; padding: 6px 8px; font-size: 12px; color: var(--navy); }
+
+  /* SECTION SUBHEADER */
+  .subsection-label { font-size: 11px; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 0 4px; margin-top: 4px; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 11px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: all 0.15s; text-transform: uppercase; letter-spacing: 0.5px; }
+  .btn-primary { background: var(--orange); color: white; }
+  .btn-primary:hover { background: var(--orange-light); }
+  .btn-navy { background: var(--navy); color: white; }
+  .btn-navy:hover { background: var(--navy-mid); }
+  .btn-outline { background: transparent; color: var(--navy); border: 2px solid var(--navy); }
+  .btn-outline:hover { background: var(--navy); color: white; }
+  .btn-sm { padding: 7px 14px; font-size: 12px; }
+  .btn-green { background: var(--green); color: white; }
+
+  /* ACTION BAR */
+  .action-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+
+  /* OUTPUT AREAS */
+  .output-box { background: #f8f9fb; border: 1px solid var(--gray-mid); border-radius: 8px; padding: 14px; font-size: 12px; font-family: 'Courier New', monospace; white-space: pre-wrap; line-height: 1.6; min-height: 200px; max-height: 500px; overflow-y: auto; }
+  .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .output-title { font-size: 13px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* MATERIAL TABLE */
+  .mat-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .mat-table th { background: var(--navy); color: white; padding: 9px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .mat-table td { padding: 8px 10px; border-bottom: 1px solid var(--gray-mid); vertical-align: top; }
+  .mat-table tr:nth-child(even) td { background: #f9fafc; }
+  .mat-table tr:hover td { background: #fff3ef; }
+  .mat-table .cat-row td { background: var(--navy-mid); color: white; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+  .sku-tag { display: inline-block; background: #e8edf3; border-radius: 4px; padding: 2px 6px; font-family: monospace; font-size: 11px; color: #2a4060; }
+  .vendor-tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .vendor-hd { background: #f96302; color: white; }
+  .vendor-amz { background: #ff9900; color: #1a1a1a; }
+  .vendor-cy { background: #2a7a4b; color: white; }
+  .vendor-zh { background: #6a4fc0; color: white; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--navy); color: white; padding: 12px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 9999; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .toast.show { display: block; animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* PROGRESS */
+  .progress-bar { background: var(--gray-mid); border-radius: 4px; height: 6px; margin-top: 8px; }
+  .progress-fill { background: var(--orange); border-radius: 4px; height: 100%; transition: width 0.3s; }
+  .progress-label { font-size: 11px; color: var(--gray-text); margin-top: 4px; }
+
+  /* BADGE */
+  .badge { display: inline-block; background: var(--orange); color: white; border-radius: 10px; padding: 1px 7px; font-size: 10px; font-weight: 700; margin-left: 6px; }
+
+  /* INTRO CARD */
+  .intro-card { background: var(--navy); color: white; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .intro-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .intro-card p { font-size: 12px; color: #8aa0b8; line-height: 1.5; }
+
+  /* SPLIT-OPTION items (reglaze vs replace etc) */
+  .option-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .option-pill { padding: 4px 10px; border-radius: 12px; border: 1.5px solid var(--gray-mid); font-size: 11px; font-weight: 600; cursor: pointer; }
+  .option-pill.selected { border-color: var(--orange); background: var(--orange); color: white; }
+
+  /* MEASUREMENTS */
+  .meas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .meas-field { display: flex; flex-direction: column; gap: 5px; }
+  .meas-field label { font-size: 11px; font-weight: 700; color: var(--gray-text); text-transform: uppercase; letter-spacing: 0.4px; }
+  .meas-field input, .meas-field select { border: 1px solid var(--gray-mid); border-radius: 6px; padding: 8px 10px; font-size: 13px; color: var(--navy); width: 100%; }
+  .meas-field input:focus, .meas-field select:focus { outline: none; border-color: var(--orange); }
+  .meas-field input[readonly] { color: var(--gray-text); cursor: default; }
+  .meas-hint { font-size: 11px; color: var(--gray-text); line-height: 1.4; }
+  .calc-box { background: #eef2f7; border-radius: 8px; padding: 12px 14px; margin-top: 8px; }
+  .calc-title { font-size: 11px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+  .calc-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; border-bottom: 1px solid #d8e0ea; }
+  .calc-row:last-child { border-bottom: none; }
+  .calc-row span:last-child { font-weight: 700; color: var(--orange); min-width: 80px; text-align: right; }
+  .door-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top:8px; }
+  .door-table th { background: var(--navy); color: white; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; }
+  .door-table td { padding: 7px 8px; border-bottom: 1px solid var(--gray-mid); }
+  .door-table td input, .door-table td select { width: 100%; border: 1px solid var(--gray-mid); border-radius: 4px; padding: 5px 7px; font-size: 12px; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <div>
+      <div class="header-logo">MBI <span>EQUITY</span> PARTNERS</div>
+      <div class="header-sub">Unit Renovation Toolkit</div>
+    </div>
+  </div>
+  <div class="header-unit" id="headerUnitName">—</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('walkthrough')">📋 Walkthrough</div>
+  <div class="tab" onclick="showTab('measurements')">📐 Measurements</div>
+  <div class="tab" onclick="showTab('sow')">📄 SOW</div>
+  <div class="tab" onclick="showTab('materials')">🛒 Material List</div>
+  <div class="tab" onclick="showTab('orders')">📦 Purchase Orders</div>
+</div>
+
+<!-- ==================== TAB 1: WALKTHROUGH ==================== -->
+<div id="tab-walkthrough" class="panel active">
+  <div class="intro-card">
+    <h3>Unit Walkthrough</h3>
+    <p>Fill in property info, then tap each item as you walk the unit. All selections flow automatically to SOW, material list, and purchase orders.</p>
+  </div>
+
+  <!-- UNIT INFO -->
+  <div class="unit-bar">
+    <div class="field-group">
+      <label>Property / Address</label>
+      <input type="text" id="propAddress" placeholder="e.g. 10736 Shire Place" oninput="updateHeader()">
+    </div>
+    <div class="field-group">
+      <label>Unit #</label>
+      <input type="text" id="unitNum" placeholder="e.g. Unit 4" oninput="updateHeader()">
+    </div>
+    <div class="field-group">
+      <label>Bedrooms</label>
+      <select id="numBeds" onchange="updateBedrooms()">
+        <option value="1">1 Bedroom</option>
+        <option value="2" selected>2 Bedrooms</option>
+        <option value="3">3 Bedrooms</option>
+        <option value="4">4 Bedrooms</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Bathrooms</label>
+      <select id="numBaths">
+        <option value="1full">1 Full Bath</option>
+        <option value="1full1half">1 Full + 1 Half</option>
+        <option value="2full" selected>2 Full Baths</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Unit SqFt</label>
+      <input type="number" id="unitSqft" placeholder="e.g. 750" oninput="recalcMeasurements()">
+    </div>
+    <div class="field-group">
+      <label>Date</label>
+      <input type="date" id="sowDate">
+    </div>
+  </div>
+
+  <!-- GENERAL -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      General <span style="color:#8aa0b8;font-weight:400;font-size:11px;">Demo, Paint, Flooring, Plumbing, Electrical</span>
+      <span class="toggle">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="scope-grid">
+        <!-- DEMO -->
+        <div class="subsection-label" style="grid-column:1/-1">Demo</div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="demo_carpet">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Remove Carpet & Baseboards</div>
+          <div class="scope-sub">Demo all carpet, strip baseboards</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="demo_ceilings">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Scrape & Smooth Ceilings</div>
+          <div class="scope-sub">Popcorn removal / skim coat</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="demo_wallpaper">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Remove Wallpaper</div>
+          <div class="scope-sub">Where present</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="demo_trash">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Remove All Trash / Junk</div>
+          <div class="scope-sub">Full unit cleanout</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+
+        <!-- PAINT -->
+        <div class="subsection-label" style="grid-column:1/-1">Paint</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="paint_walls">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Paint Ceilings & All Walls</div>
+          <div class="scope-sub">Standard throughout unit</div>
+          <textarea class="scope-note" placeholder="Colors / rooms..."></textarea></div>
+        </div>
+
+        <!-- FLOORING -->
+        <div class="subsection-label" style="grid-column:1/-1">Flooring</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="flooring_lvp">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">New LVP Flooring Throughout</div>
+          <div class="scope-sub">SPC Luxury Vinyl Plank — CY Flooring</div>
+          <div class="scope-options">
+            <select>
+              <option>Standard SPC (SPC-JW8005) — $1.59/sf</option>
+              <option>Sub-floor leveling required</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="SF estimate, special areas..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="flooring_base">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">New Baseboards</div>
+          <div class="scope-sub">3½" MDF Base Molding — CY Flooring (830B 3+1/2")</div>
+          <textarea class="scope-note" placeholder="LF estimate..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="flooring_level">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Sub-Floor Leveling</div>
+          <div class="scope-sub">Sika self-leveling underlayment</div>
+          <textarea class="scope-note" placeholder="Areas requiring leveling..."></textarea></div>
+        </div>
+
+        <!-- ELECTRICAL -->
+        <div class="subsection-label" style="grid-column:1/-1">Electrical / Plumbing</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="elec_outlets">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Replace All Outlets & Cover Plates</div>
+          <div class="scope-sub">White tamper-resistant throughout</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="plumb_anglestops">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Replace Angle Stops</div>
+          <div class="scope-sub">Where necessary; replace galvanized if present</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="plumb_repipe">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Re-pipe Plumbing</div>
+          <div class="scope-sub">Full unit re-pipe</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="gen_smokedetect">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">CO / Smoke Alarms</div>
+          <div class="scope-sub">Re-install / add throughout unit</div>
+          <textarea class="scope-note" placeholder="Qty / locations..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="gen_wd_hookup">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Washer / Dryer Hookup</div>
+          <div class="scope-sub">Install W/D connections (permit may be required)</div>
+          <textarea class="scope-note" placeholder="Location / type..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERIOR DOORS -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Interior Doors <span style="color:#8aa0b8;font-weight:400;font-size:11px;">Doors, Hardware, Blinds</span><span class="toggle">▼</span></div>
+    <div class="section-body">
+      <div class="scope-grid">
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="door_replace">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Replace Interior Doors</div>
+          <div class="scope-sub">6-Panel Hollow Core 30×80 — Masonite SKU 61094 (HD)</div>
+          <div class="scope-options">
+            <select>
+              <option>Replace all doors</option>
+              <option>Replace select doors only</option>
+              <option>Repaint existing doors</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Qty, which doors..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="door_hardware">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Matte Black Door Hardware</div>
+          <div class="scope-sub">Passage knobs, backstops, hinges (Amazon)</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="door_blinds">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Install Blinds — All Windows</div>
+          <div class="scope-sub">White cordless 1" roller blinds (HD)</div>
+          <textarea class="scope-note" placeholder="Window count / sizes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="door_ext_locks">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Replace Exterior Locks</div>
+          <div class="scope-sub">Matte Black Entry Set (Amazon B0C1VP22CZ)</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KITCHEN -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Kitchen <span style="color:#8aa0b8;font-weight:400;font-size:11px;">Cabinets, Countertops, Sink, Appliances, Lighting</span><span class="toggle">▼</span></div>
+    <div class="section-body">
+      <div class="scope-grid">
+
+        <div class="subsection-label" style="grid-column:1/-1">Cabinets</div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="kit_cab_replace">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Replace Cabinets</div>
+          <div class="scope-sub">Hampton Bay 30" Unfinished — HD SKU KB30-UF / 302970323</div>
+          <textarea class="scope-note" placeholder="Linear footage, layout notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="kit_cab_paint">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Sand & Paint Existing Cabinets</div>
+          <div class="scope-sub">Doors, drawers, insides/shelves — matte black hardware</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="kit_cab_hardware">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Matte Black Cabinet Hardware</div>
+          <div class="scope-sub">Bar pulls + hinges (Amazon); soft-close hinges B09M8FXVYR</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+
+        <div class="subsection-label" style="grid-column:1/-1">Countertop & Sink</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="kit_counter">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">New Countertop + 6" Backsplash</div>
+          <div class="scope-sub">White Quartz 110×26 — ZH Stone SKU W028-11026-Combo ($310)</div>
+          <div class="scope-options">
+            <select>
+              <option>Standard w/ backsplash — 110×26 (W028-11026-Combo) $310</option>
+              <option>Island countertop — 110×42 (W028-11024) $530</option>
+              <option>Backsplash only — 110×6 (W028-110x6-Back) $45</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Dimensions, layout notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="kit_sink">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Undermount Sink & Faucet</div>
+          <div class="scope-sub">SS Undermount (ZH Stone SQ-S $95) + Matte Black Faucet (Amazon B08Z3M9HPM)</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="kit_disposal">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Garbage Disposal</div>
+          <div class="scope-sub">Standard unit — Amazon ASIN B000JQN7LY</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+
+        <div class="subsection-label" style="grid-column:1/-1">Appliances</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="app_fridge">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Refrigerator</div>
+          <div class="scope-sub">Stainless steel — Home Depot</div>
+          <div class="scope-options">
+            <select>
+              <option>Frigidaire 18.3cf Top Freezer — SKU 1005852334 ($698)</option>
+              <option>Vissani 18cf Top Freezer — SKU 1006460551 ($729)</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="app_range">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Gas Range / Stove</div>
+          <div class="scope-sub">30" stainless — Home Depot</div>
+          <div class="scope-options">
+            <select>
+              <option>Amana 30" 4-Burner — SKU 1010323197 ($698)</option>
+              <option>GE 30" 4.8cf — SKU 1012075662 ($628)</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Gas or electric? Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="app_micro_otr">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Over-Range Microwave</div>
+          <div class="scope-sub">Above stove — Home Depot</div>
+          <div class="scope-options">
+            <select>
+              <option>Amana 1.6cf OTR — SKU 1001969212 ($238)</option>
+              <option>Vissani 1.1cf Countertop — SKU 1010954456 ($109)</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="app_hood">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Range Hood</div>
+          <div class="scope-sub">Under-cabinet or non-vented — Home Depot</div>
+          <div class="scope-options">
+            <select>
+              <option>Vissani Capreio 30" Under-Cabinet — SKU 1003991504 ($179)</option>
+              <option>Whirlpool 30" Non-Vented — SKU 1001000147 ($138)</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="app_dw">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Dishwasher</div>
+          <div class="scope-sub">24" stainless — Home Depot</div>
+          <div class="scope-options">
+            <select>
+              <option>GE 24" Front Control — SKU 1008493078 ($348)</option>
+              <option>Frigidaire 24" — SKU 1003404850 ($358)</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="app_wd">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Washer / Dryer</div>
+          <div class="scope-sub">Configuration depends on space/hookup</div>
+          <div class="scope-options">
+            <select>
+              <option>GE Profile Combo 4.6cf — SKU 1012165319 ($1,798)</option>
+              <option>Equator Compact 110V Combo — SKU 1009381435 ($1,539)</option>
+              <option>GE Stacked Small 2.3/4.4cf Gas — SKU 1003012281 ($1,398)</option>
+              <option>GE Stacked Large 3.8/5.9cf Gas — SKU 1003951534 ($1,498)</option>
+              <option>Separate: GE Washer 5.0cf + GE Dryer 7.4cf Gas</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Hookup type, space constraints..."></textarea></div>
+        </div>
+
+        <div class="subsection-label" style="grid-column:1/-1">Kitchen Lighting</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="kit_lights">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">New Flush Ceiling Lights (Kitchen)</div>
+          <div class="scope-sub">LED Flush Mount — Amazon ASIN B0DF6XPZ9R</div>
+          <textarea class="scope-note" placeholder="Qty..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="kit_canlights">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Can Lights</div>
+          <div class="scope-sub">Recessed lighting in kitchen</div>
+          <textarea class="scope-note" placeholder="Qty..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="kit_fan_dining">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Ceiling Fan — Dining Area</div>
+          <div class="scope-sub">Replace dining light with fan</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATHROOM -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Bathroom(s) <span style="color:#8aa0b8;font-weight:400;font-size:11px;">Tub/Shower, Vanity, Toilet, Accessories</span><span class="toggle">▼</span></div>
+    <div class="section-body">
+      <div class="scope-grid">
+
+        <div class="subsection-label" style="grid-column:1/-1">Tub / Shower</div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="bath_tub_replace">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Replace Tub + Tile + Shower Door</div>
+          <div class="scope-sub">60×30 Tub (HD SKU 314614199) + Daltile 12×12 tile + Matte Black Shower Door (SKU 331783339)</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="bath_tub_reglaze">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Reglaze Tub & Tile</div>
+          <div class="scope-sub">Reglaze existing tub/tile (price both options)</div>
+          <textarea class="scope-note" placeholder="Notes on condition..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="bath_shower_door">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Shower Door</div>
+          <div class="scope-sub">Matte Black Sliding 56-60"W × 58"H — HD SKU 331783339</div>
+          <textarea class="scope-note" placeholder="Size confirmation..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="bath_shower_curtain">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Shower Rod & Curtain</div>
+          <div class="scope-sub">If no door — reglaze units</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+
+        <div class="subsection-label" style="grid-column:1/-1">Shower Fixtures</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bath_shower_faucet">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Shower Faucet Set — Matte Black</div>
+          <div class="scope-sub">Amazon — full replacement or reglaze option</div>
+          <div class="scope-options">
+            <select>
+              <option>3-Handle Set — B0CGQQK9CB (full replacement)</option>
+              <option>1-Handle Set — B0B6CL7YTS (full replacement)</option>
+              <option>Reglaze: Head Neck B0C3HBW1GD + 3-Piece Knob B0F26CHP6T</option>
+              <option>Reglaze: Dual Shower Head B0F5W872RM</option>
+            </select>
+          </div>
+          <div class="scope-options" style="margin-top:4px;">
+            <select>
+              <option>Drain Kit B0D5Y5P5SF + Tub Spout B0CN16KYGC</option>
+              <option>Drain only</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+
+        <div class="subsection-label" style="grid-column:1/-1">Vanity & Toilet</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bath_toilet">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Replace Toilet</div>
+          <div class="scope-sub">Standard toilet — Home Depot</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="bath_vanity_replace">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Replace Vanity</div>
+          <div class="scope-sub">Glacier Bay 31" White — HD SKU GB30P2-WH / 203486570</div>
+          <textarea class="scope-note" placeholder="Size to fit..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="bath_vanity_paint">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Repaint Vanity & Reglaze Sink</div>
+          <div class="scope-sub">Paint existing vanity + reglaze sink surface</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bath_vanity_faucet">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Vanity Sink Faucet — Matte Black</div>
+          <div class="scope-sub">Amazon ASIN B07SXK14HQ</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+
+        <div class="subsection-label" style="grid-column:1/-1">Mirrors, Lighting & Accessories</div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bath_mirror">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Bathroom Mirror — Matte Black Frame</div>
+          <div class="scope-sub">Amazon — size to fit</div>
+          <div class="scope-options">
+            <select>
+              <option>30×22 — ASIN B0CQJRRZPG</option>
+              <option>30×40 — ASIN B0CV52NVG5</option>
+              <option>30×60 — ASIN B0CPL7G5YN</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bath_medcab">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Medicine Cabinet</div>
+          <div class="scope-sub">Zenith 16×26 — HD SKU 1806 / 100191089</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bath_light">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Vanity Light Fixture — Matte Black</div>
+          <div class="scope-sub">Amazon — above vanity</div>
+          <div class="scope-options">
+            <select>
+              <option>3-Light — ASIN B0963M4H4J (standard vanities)</option>
+              <option>4-Light — ASIN B0F18VKVXX (wider vanities)</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="bath_exhaust">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Exhaust Fan</div>
+          <div class="scope-sub">Broan-NuTone 50 CFM — HD SKU 696N / 100081599</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bath_accessories">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Bath Accessories — Matte Black</div>
+          <div class="scope-sub">Towel bar, ring, hooks, TP holder</div>
+          <div class="scope-options">
+            <select>
+              <option>Full Bath Set (5-pc) — Amazon B0CCD5RWDB</option>
+              <option>Half Bath Set (2-pc) — Amazon B0C5D6Z9FS</option>
+              <option>Additional Set — Amazon B0DH1ZKD17</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Full or half bath..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="bath_tile_trim">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Tile Edge Trim</div>
+          <div class="scope-sub">Schluter Schiene Black 3/8" — HD SKU A100AGSG / 202602045</div>
+          <textarea class="scope-note" placeholder="LF needed..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEDROOMS / HALL / LIVING ROOM -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Bedrooms, Hall & Living Room <span style="color:#8aa0b8;font-weight:400;font-size:11px;">Closets, Fans, A/C, Lighting</span><span class="toggle">▼</span></div>
+    <div class="section-body">
+      <div class="scope-grid">
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bed_closet_mirrors">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Closet Mirror Doors</div>
+          <div class="scope-sub">Wardrobe Savoy 59×80½ — HD SKU SAV-5980WHMNC2U / 202089907</div>
+          <textarea class="scope-note" placeholder="Qty, opening dimensions..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="bed_ceil_fans">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Ceiling Fan w/ Light — Each Bedroom</div>
+          <div class="scope-sub">Modern 3-Blade Matte Black — Amazon ASIN B0DTKHBK68 (1 per bedroom)</div>
+          <textarea class="scope-note" placeholder="Qty = # of bedrooms..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="living_ceil_fan">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Ceiling Fan / Light — Living Room</div>
+          <div class="scope-sub">Matte Black ceiling fan</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="hall_light">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Ceiling Light — Hallway</div>
+          <div class="scope-sub">LED Flush Mount — Amazon ASIN B0DF6XPZ9R</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="living_canlights">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Can Lights — Living Room</div>
+          <div class="scope-sub">Recessed lighting</div>
+          <textarea class="scope-note" placeholder="Qty (typically 6-8)..."></textarea></div>
+        </div>
+        <div class="scope-item checked" onclick="toggleItem(this)" data-key="gen_ac">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Wall A/C Unit</div>
+          <div class="scope-sub">14,000 BTU 220V — HD SKU 1012544898</div>
+          <div class="scope-options">
+            <select>
+              <option>Replace existing wall A/C</option>
+              <option>Install new wall A/C</option>
+              <option>A/C not required</option>
+            </select>
+          </div>
+          <textarea class="scope-note" placeholder="Location, condition notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="gen_thermostat">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Thermostat</div>
+          <div class="scope-sub">Honeywell CT31A — HD SKU 100400017</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+        <div class="scope-item" onclick="toggleItem(this)" data-key="gen_heater">
+          <div class="scope-check">✓</div>
+          <div><div class="scope-label">Paint Heater Matte Black</div>
+          <div class="scope-sub">Wall heater paint</div>
+          <textarea class="scope-note" placeholder="Notes..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADDITIONAL NOTES -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Additional Items & Notes<span class="toggle">▼</span></div>
+    <div class="section-body">
+      <textarea id="additionalNotes" style="width:100%;border:1px solid #d1d9e0;border-radius:8px;padding:10px;font-size:13px;min-height:100px;font-family:var(--font);" placeholder="Add any property-specific items, contractor notes, or special instructions..."></textarea>
+    </div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="generateAll()">⚡ Generate SOW</button>
+    <button class="btn btn-navy" onclick="showTab('measurements')">📐 Add Measurements</button>
+    <button class="btn btn-navy" onclick="showTab('sow')">📄 View SOW</button>
+    <button class="btn btn-outline btn-sm" onclick="clearAll()">🗑 Reset</button>
+  </div>
+</div>
+
+
+<!-- ==================== TAB 2: MEASUREMENTS ==================== -->
+<div id="tab-measurements" class="panel">
+  <div class="intro-card">
+    <h3>📐 Measurements &amp; Specs</h3>
+    <p>Fill this in after your walkthrough — at your desk with photos/notes, or when you're ready to order. These drive all quantity calculations in the Material List and Purchase Orders.</p>
+  </div>
+
+  <!-- UNIT DIMENSIONS -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Unit Dimensions &amp; Ceilings <span class="toggle">▼</span></div>
+    <div class="section-body">
+      <div class="meas-grid">
+        <div class="meas-field">
+          <label>Total Unit SqFt</label>
+          <input type="number" id="m_sqft" placeholder="e.g. 750" oninput="recalcMeasurements()">
+          <div class="meas-hint">Drives flooring, baseboard, and ceiling material estimates</div>
+        </div>
+        <div class="meas-field">
+          <label>Ceiling Height</label>
+          <select id="m_ceil_height" onchange="recalcMeasurements()">
+            <option value="8">8 ft</option>
+            <option value="9">9 ft</option>
+            <option value="10">10 ft</option>
+          </select>
+        </div>
+        <div class="meas-field">
+          <label>Ceiling Condition</label>
+          <select id="m_ceil_type">
+            <option value="scrape">Scrape + Smooth (popcorn removal)</option>
+            <option value="skim">Skim coat only</option>
+            <option value="paint">Paint only</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-box" id="calc_flooring">
+        <div class="calc-title">Auto-Calculated — Flooring &amp; Ceiling</div>
+        <div class="calc-row"><span>LVP Flooring (SqFt + 10% waste)</span><span id="calc_lvp_sf">— Enter SqFt above</span></div>
+        <div class="calc-row"><span>Baseboard (est. LF)</span><span id="calc_base_lf">—</span></div>
+        <div class="calc-row"><span>Joint Compound — 3.5 gal bucket (1 per 100 SF)</span><span id="calc_jc">—</span></div>
+        <div class="calc-row"><span>FastSet / Setting-Type Compound (1 bag per 150 SF)</span><span id="calc_fast">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOORS -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Interior Doors <span class="toggle">▼</span></div>
+    <div class="section-body">
+      <div class="meas-grid">
+        <div class="meas-field">
+          <label>Number of Interior Doors</label>
+          <input type="number" id="m_door_count" placeholder="e.g. 5" min="1" max="20" oninput="buildDoorTable()">
+        </div>
+      </div>
+      <div id="door_table_container" style="margin-top:12px;"></div>
+      <div class="meas-hint" style="margin-top:8px;">Common sizes from your purchase history: 30×80 (standard), 28×80, 32×80. Closet mirror doors measured separately below.</div>
+    </div>
+  </div>
+
+  <!-- BLINDS -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Window Blinds <span class="toggle">▼</span></div>
+    <div class="section-body">
+      <div class="meas-hint" style="margin-bottom:10px;">Enter each window. SKU is auto-selected based on width. All are cordless white 1" roller blinds (cut to width at HD).</div>
+      <table class="mat-table" id="blinds_table">
+        <thead><tr>
+          <th>Room</th><th>Width (in)</th><th>Height (in)</th><th>Qty</th><th>HD SKU</th><th></th>
+        </tr></thead>
+        <tbody id="blinds_rows"></tbody>
+      </table>
+      <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="addBlindRow()">+ Add Window</button>
+    </div>
+  </div>
+
+  <!-- KITCHEN -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Kitchen — Cabinets &amp; Appliances <span class="toggle">▼</span></div>
+    <div class="section-body">
+
+      <div class="subsection-label">Cabinets</div>
+      <div class="meas-grid">
+        <div class="meas-field">
+          <label>Cabinet Type</label>
+          <select id="m_cab_type" onchange="toggleCabFields()">
+            <option value="prefab">Prefab (Hampton Bay or similar)</option>
+            <option value="custom">Custom / Cabinet Shop</option>
+            <option value="paint">Paint Existing — No New Cabinets</option>
+          </select>
+        </div>
+      </div>
+      <div id="prefab_fields" style="margin-top:10px;">
+        <div class="meas-grid">
+          <div class="meas-field">
+            <label>Base Cabinet Run (linear ft)</label>
+            <input type="number" id="m_cab_base_lf" placeholder="e.g. 10" oninput="calcCabinets()">
+          </div>
+          <div class="meas-field">
+            <label>Upper Cabinet Run (linear ft)</label>
+            <input type="number" id="m_cab_upper_lf" placeholder="e.g. 10" oninput="calcCabinets()">
+          </div>
+          <div class="meas-field">
+            <label>Standard Cabinet Width</label>
+            <select id="m_cab_width">
+              <option value="30">30" wide (standard)</option>
+              <option value="24">24" wide</option>
+              <option value="18">18" wide</option>
+              <option value="36">36" wide</option>
+              <option value="mixed">Mixed widths</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-box" style="margin-top:10px;">
+          <div class="calc-title">Estimated Cabinet Count</div>
+          <div class="calc-row"><span>Base Cabinets (30" wide)</span><span id="calc_base_cabs">— Enter LF above</span></div>
+          <div class="calc-row"><span>Upper Cabinets (30" wide)</span><span id="calc_upper_cabs">—</span></div>
+          <div class="calc-row meas-hint" style="padding:4px 0;"><span>Note: Size to fit — verify layout with contractor before ordering</span></div>
+        </div>
+      </div>
+      <div id="custom_fields" style="display:none;margin-top:10px;">
+        <div class="meas-grid">
+          <div class="meas-field">
+            <label>Cabinet Shop / Vendor</label>
+            <input type="text" id="m_cab_vendor" placeholder="Vendor name">
+          </div>
+          <div class="meas-field">
+            <label>Notes / Quote Status</label>
+            <input type="text" id="m_cab_notes" placeholder="e.g. Pending quote from vendor">
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection-label" style="margin-top:16px;">Countertop Dimensions</div>
+      <div class="meas-grid">
+        <div class="meas-field">
+          <label>Counter Length (in) — default 110"</label>
+          <input type="number" id="m_counter_len" placeholder="110" value="110">
+        </div>
+        <div class="meas-field">
+          <label>Counter Depth (in) — default 26"</label>
+          <input type="number" id="m_counter_depth" placeholder="26" value="26">
+        </div>
+      </div>
+
+      <div class="subsection-label" style="margin-top:16px;">Appliance Confirmations</div>
+      <div class="meas-grid">
+        <div class="meas-field">
+          <label>Refrigerator Opening Width</label>
+          <select id="m_fridge_w">
+            <option value="30">30" (standard)</option>
+            <option value="33">33"</option>
+            <option value="36">36"</option>
+            <option value="28">28" (compact)</option>
+          </select>
+        </div>
+        <div class="meas-field">
+          <label>Range / Stove Opening</label>
+          <select id="m_range_w">
+            <option value="30">30" (standard)</option>
+            <option value="24">24"</option>
+            <option value="36">36"</option>
+          </select>
+        </div>
+        <div class="meas-field">
+          <label>Dishwasher Opening</label>
+          <select id="m_dw_w">
+            <option value="24">24" (standard)</option>
+            <option value="18">18" (compact)</option>
+          </select>
+        </div>
+        <div class="meas-field">
+          <label>W/D Space (W × D inches)</label>
+          <input type="text" id="m_wd_space" placeholder="e.g. 27 × 30">
+        </div>
+        <div class="meas-field">
+          <label>W/D Hookup Type</label>
+          <select id="m_wd_hookup">
+            <option value="gas">Gas dryer</option>
+            <option value="electric">Electric dryer (220V)</option>
+            <option value="110v">110V combo only</option>
+            <option value="none">No hookup yet</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATHROOM -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">Bathroom(s) <span class="toggle">▼</span></div>
+    <div class="section-body">
+
+      <div class="subsection-label">Vanity</div>
+      <div class="meas-grid">
+        <div class="meas-field">
+          <label>Full Bath Vanity Width</label>
+          <select id="m_vanity_w" onchange="updateVanitySKU()">
+            <option value="24">24"</option>
+            <option value="30" selected>30–31" (standard)</option>
+            <option value="36">36"</option>
+            <option value="42">42"</option>
+            <option value="48">48"</option>
+            <option value="60">60"</option>
+          </select>
+        </div>
+        <div class="meas-field">
+          <label>HD SKU (auto-selected)</label>
+          <input type="text" id="m_vanity_sku" readonly style="background:#f4f6f9;" value="203486570 (GB30P2-WH)">
+        </div>
+        <div class="meas-field">
+          <label>Half Bath Vanity Width (if applicable)</label>
+          <select id="m_vanity_half_w">
+            <option value="none">No half bath</option>
+            <option value="18">18"</option>
+            <option value="24">24"</option>
+            <option value="30">30"</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="subsection-label" style="margin-top:16px;">Tub Surround Tile (if replacing tub)</div>
+      <div class="meas-grid">
+        <div class="meas-field">
+          <label>Tub Width (in) — default 60"</label>
+          <input type="number" id="m_tub_w" placeholder="60" value="60" oninput="calcTileMaterials()">
+        </div>
+        <div class="meas-field">
+          <label>Tile Height on Walls (in) — default 60"</label>
+          <input type="number" id="m_tile_h" placeholder="60" value="60" oninput="calcTileMaterials()">
+        </div>
+        <div class="meas-field">
+          <label>Tub Depth (in) — default 32"</label>
+          <input type="number" id="m_tub_d" placeholder="32" value="32" oninput="calcTileMaterials()">
+        </div>
+      </div>
+      <div class="calc-box" style="margin-top:10px;" id="tile_calc_box">
+        <div class="calc-title">Auto-Calculated — Tub Tile Materials</div>
+        <div class="calc-row"><span>Tile Area (3-wall surround + 15% waste)</span><span id="calc_tile_sf">—</span></div>
+        <div class="calc-row"><span>Daltile 12×12 Cases (11 SF/case)</span><span id="calc_tile_cases">—</span></div>
+        <div class="calc-row"><span>Tile Trim LF (Schluter Schiene)</span><span id="calc_trim_lf">—</span></div>
+        <div class="calc-row"><span>Grout — Polyblend 25lb bag (1 per ~50 SF)</span><span id="calc_grout">—</span></div>
+        <div class="calc-row"><span>Mortar — 50lb bag (1 per ~40 SF)</span><span id="calc_mortar">—</span></div>
+        <div class="calc-row"><span>Backer Board 3×5 sheets (1 per ~15 SF)</span><span id="calc_backer">—</span></div>
+      </div>
+
+      <div class="subsection-label" style="margin-top:16px;">Shower Door</div>
+      <div class="meas-grid">
+        <div class="meas-field">
+          <label>Shower Opening Width (in)</label>
+          <input type="number" id="m_shower_w" placeholder="56–60" oninput="updateShowerDoorSKU()">
+          <div class="meas-hint">SKU 331783339 fits 56–60" — verify opening before ordering</div>
+        </div>
+        <div class="meas-field">
+          <label>Closet Mirror Door Openings</label>
+          <input type="text" id="m_closet_dims" placeholder="e.g. 59×80, 71×80">
+          <div class="meas-hint">Verify opening height and width — size to fit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="generateAll();showTab('materials')">⚡ Generate Material List &amp; Orders</button>
+    <button class="btn btn-navy" onclick="showTab('sow')">📄 View SOW</button>
+  </div>
+</div>
+
+<!-- ==================== TAB 2: SOW ==================== -->
+<div id="tab-sow" class="panel">
+  <div class="section">
+    <div class="section-body">
+      <div class="output-header">
+        <div class="output-title">Scope of Work</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="generateAll();showTab('sow')">🔄 Regenerate</button>
+          <button class="btn btn-green btn-sm" onclick="downloadSOWasDoc()">⬇ Download .doc</button>
+          <button class="btn btn-navy btn-sm" onclick="copyOutput('sow-output')">📋 Copy</button>
+        </div>
+      </div>
+      <div id="sow-output" class="output-box">Click "Generate All Outputs" on the Walkthrough tab to produce your SOW.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB 3: MATERIALS ==================== -->
+<div id="tab-materials" class="panel">
+  <div class="section">
+    <div class="section-body">
+      <div class="output-header">
+        <div class="output-title">Material Order List</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="generateAll();showTab('materials')">🔄 Regenerate</button>
+          <button class="btn btn-green btn-sm" onclick="downloadMaterialCSV()">⬇ Download .csv</button>
+        </div>
+      </div>
+      <div id="materials-output">
+        <p style="color:#6b7a8d;font-size:13px;padding:20px;">Click "Generate All Outputs" on the Walkthrough tab to produce your material list.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB 4: PURCHASE ORDERS ==================== -->
+<div id="tab-orders" class="panel">
+  <!-- HD MATERIALS -->
+  <div class="section">
+    <div class="section-header">Home Depot — Materials<span class="toggle" style="transform:rotate(0deg)">▼</span></div>
+    <div class="section-body">
+      <div class="output-header" style="margin-bottom:6px;">
+        <div class="output-title" style="font-size:11px;">Email to HD Contact · Subject: MBI Order — [Property] [Unit]</div>
+        <button class="btn btn-navy btn-sm" onclick="copyOutput('hd-materials-output')">📋 Copy</button>
+      </div>
+      <div id="hd-materials-output" class="output-box" style="min-height:120px;">Generate outputs first.</div>
+    </div>
+  </div>
+  <!-- HD PAINT -->
+  <div class="section">
+    <div class="section-header">Home Depot — Paint<span class="toggle" style="transform:rotate(0deg)">▼</span></div>
+    <div class="section-body">
+      <div class="output-header" style="margin-bottom:6px;">
+        <div class="output-title" style="font-size:11px;">Separate paint order</div>
+        <button class="btn btn-navy btn-sm" onclick="copyOutput('hd-paint-output')">📋 Copy</button>
+      </div>
+      <div id="hd-paint-output" class="output-box" style="min-height:80px;">Generate outputs first.</div>
+    </div>
+  </div>
+  <!-- HD APPLIANCES -->
+  <div class="section">
+    <div class="section-header">Home Depot — Appliances<span class="toggle" style="transform:rotate(0deg)">▼</span></div>
+    <div class="section-body">
+      <div class="output-header" style="margin-bottom:6px;">
+        <div class="output-title" style="font-size:11px;">Separate appliance order</div>
+        <button class="btn btn-navy btn-sm" onclick="copyOutput('hd-appliances-output')">📋 Copy</button>
+      </div>
+      <div id="hd-appliances-output" class="output-box" style="min-height:80px;">Generate outputs first.</div>
+    </div>
+  </div>
+  <!-- AMAZON -->
+  <div class="section">
+    <div class="section-header">Amazon Order List<span class="toggle" style="transform:rotate(0deg)">▼</span></div>
+    <div class="section-body">
+      <div class="output-header" style="margin-bottom:6px;">
+        <div class="output-title" style="font-size:11px;">ASINs to order at amazon.com</div>
+        <button class="btn btn-navy btn-sm" onclick="copyOutput('amazon-output')">📋 Copy</button>
+      </div>
+      <div id="amazon-output" class="output-box" style="min-height:80px;">Generate outputs first.</div>
+    </div>
+  </div>
+  <!-- OTHER VENDORS -->
+  <div class="section">
+    <div class="section-header">Other Vendors (CY Flooring / ZH Stone)<span class="toggle" style="transform:rotate(0deg)">▼</span></div>
+    <div class="section-body">
+      <div id="vendors-output" class="output-box" style="min-height:80px;">Generate outputs first.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const checkedItems = new Set();
+
+// Pre-check default items
+const defaults = [
+  'paint_walls','flooring_lvp','flooring_base','elec_outlets','plumb_anglestops','gen_smokedetect',
+  'door_replace','door_hardware','door_blinds',
+  'kit_cab_hardware','kit_counter','kit_sink','kit_disposal','app_fridge','app_range',
+  'kit_lights','kit_fan_dining',
+  'bath_shower_faucet','bath_toilet','bath_vanity_faucet','bath_mirror','bath_medcab','bath_light','bath_accessories',
+  'bed_closet_mirrors','bed_ceil_fans','living_ceil_fan','hall_light','gen_ac'
+];
+defaults.forEach(k => checkedItems.add(k));
+
+// Set today's date
+document.getElementById('sowDate').valueAsDate = new Date();
+
+// ============================================================
+// UI FUNCTIONS
+// ============================================================
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['walkthrough','measurements','sow','materials','orders'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function toggleSection(header) {
+  header.classList.toggle('collapsed');
+  const body = header.nextElementSibling;
+  body.style.display = header.classList.contains('collapsed') ? 'none' : '';
+}
+
+function toggleItem(el) {
+  // Don't toggle if clicking inside a child input/select/textarea
+  if (event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'INPUT') return;
+  el.classList.toggle('checked');
+  const key = el.dataset.key;
+  if (el.classList.contains('checked')) checkedItems.add(key);
+  else checkedItems.delete(key);
+}
+
+function updateHeader() {
+  const addr = document.getElementById('propAddress').value;
+  const unit = document.getElementById('unitNum').value;
+  document.getElementById('headerUnitName').textContent = [addr, unit].filter(Boolean).join(' — ') || '—';
+}
+
+function updateBedrooms() {
+  // Could dynamically add bedroom fan rows — simple for now
+}
+
+function getNote(key) {
+  const el = document.querySelector(`[data-key="${key}"] .scope-note`);
+  return el ? el.value.trim() : '';
+}
+
+function getSelectVal(key, idx=0) {
+  const selects = document.querySelectorAll(`[data-key="${key}"] select`);
+  return selects[idx] ? selects[idx].value : '';
+}
+
+function copyOutput(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+function clearAll() {
+  if (!confirm('Reset all selections?')) return;
+  checkedItems.clear();
+  defaults.forEach(k => checkedItems.add(k));
+  document.querySelectorAll('.scope-item').forEach(el => {
+    const key = el.dataset.key;
+    el.classList.toggle('checked', defaults.includes(key));
+  });
+  document.querySelectorAll('.scope-note').forEach(t => t.value = '');
+  document.getElementById('propAddress').value = '';
+  document.getElementById('unitNum').value = '';
+  document.getElementById('additionalNotes').value = '';
+  updateHeader();
+}
+
+// ============================================================
+// GENERATE ALL
+// ============================================================
+function generateAll() {
+  generateSOW();
+  generateMaterials();
+  generateOrders();
+}
+
+// ============================================================
+// SOW GENERATOR
+// ============================================================
+function generateSOW() {
+  const addr = document.getElementById('propAddress').value || '[Property Address]';
+  const unit = document.getElementById('unitNum').value || '[Unit]';
+  const date = document.getElementById('sowDate').value || new Date().toLocaleDateString();
+  const beds = document.getElementById('numBeds').value;
+  const baths = document.getElementById('numBaths').value;
+  const addNotes = document.getElementById('additionalNotes').value;
+
+  let sow = `MBI EQUITY PARTNERS\nSCOPE OF WORK\n`;
+  sow += `${'─'.repeat(50)}\n`;
+  sow += `Property: ${addr}\nUnit: ${unit}\nDate: ${date}\nBedrooms: ${beds} | Bathrooms: ${baths.replace('full',' Full').replace('half',' + ½')}\n`;
+  sow += `${'─'.repeat(50)}\n\n`;
+
+  // GENERAL
+  const generalItems = [];
+  if (checkedItems.has('demo_carpet')) generalItems.push('Demo: Remove carpets, baseboards' + n(getNote('demo_carpet')));
+  if (checkedItems.has('demo_ceilings')) generalItems.push('Scrape and smooth ceilings' + n(getNote('demo_ceilings')));
+  if (checkedItems.has('demo_wallpaper')) generalItems.push('Remove wallpaper where present' + n(getNote('demo_wallpaper')));
+  if (checkedItems.has('demo_trash')) generalItems.push('Remove all trash and debris from unit' + n(getNote('demo_trash')));
+  if (checkedItems.has('paint_walls')) generalItems.push('Paint ceilings and all walls' + n(getNote('paint_walls')));
+  if (checkedItems.has('flooring_lvp')) generalItems.push('Install new LVP flooring throughout' + n(getNote('flooring_lvp')));
+  if (checkedItems.has('flooring_base')) generalItems.push('Install new baseboards throughout' + n(getNote('flooring_base')));
+  if (checkedItems.has('flooring_level')) generalItems.push('Level sub-floor as required' + n(getNote('flooring_level')));
+  if (checkedItems.has('elec_outlets')) generalItems.push('Replace all electrical outlets and cover plates' + n(getNote('elec_outlets')));
+  if (checkedItems.has('plumb_anglestops')) generalItems.push('Replace angle stops where necessary; replace galvanized plumbing if present' + n(getNote('plumb_anglestops')));
+  if (checkedItems.has('plumb_repipe')) generalItems.push('Re-pipe plumbing throughout unit' + n(getNote('plumb_repipe')));
+  if (checkedItems.has('gen_smokedetect')) generalItems.push('Re-install / install carbon monoxide and smoke alarms throughout unit' + n(getNote('gen_smokedetect')));
+  if (checkedItems.has('gen_wd_hookup')) generalItems.push('Install washer/dryer hookup' + n(getNote('gen_wd_hookup')));
+
+  if (generalItems.length) {
+    sow += `GENERAL\n${generalItems.map(i => `  • ${i}`).join('\n')}\n\n`;
+  }
+
+  // INTERIOR DOORS
+  const doorItems = [];
+  const doorReplace = getSelectVal('door_replace');
+  if (checkedItems.has('door_replace')) {
+    if (doorReplace.includes('Repaint')) doorItems.push('Repaint existing interior doors' + n(getNote('door_replace')));
+    else if (doorReplace.includes('select')) doorItems.push('Replace select interior doors' + n(getNote('door_replace')));
+    else doorItems.push('Replace all interior doors' + n(getNote('door_replace')));
+  }
+  if (checkedItems.has('door_hardware')) doorItems.push('Install matte black door hardware — knobs, backstops, hinges' + n(getNote('door_hardware')));
+  if (checkedItems.has('door_blinds')) doorItems.push('Install blinds on all windows' + n(getNote('door_blinds')));
+  if (checkedItems.has('door_ext_locks')) doorItems.push('Replace exterior locks with matte black entry set' + n(getNote('door_ext_locks')));
+
+  if (doorItems.length) {
+    sow += `INTERIOR DOORS\n${doorItems.map(i => `  • ${i}`).join('\n')}\n\n`;
+  }
+
+  // KITCHEN
+  const kitItems = [];
+  if (checkedItems.has('kit_cab_replace')) kitItems.push('Install new cabinets with matte black hardware' + n(getNote('kit_cab_replace')));
+  if (checkedItems.has('kit_cab_paint')) kitItems.push('Sand and paint cabinet doors, drawers, and interior shelves; replace hinges and handles with matte black hardware' + n(getNote('kit_cab_paint')));
+  if (checkedItems.has('kit_cab_hardware') && !checkedItems.has('kit_cab_replace') && !checkedItems.has('kit_cab_paint')) kitItems.push('Replace cabinet hardware with matte black pulls and soft-close hinges');
+  if (checkedItems.has('kit_counter')) {
+    const ctOpt = getSelectVal('kit_counter');
+    kitItems.push('Install new countertop — ' + ctOpt.split(' —')[0] + n(getNote('kit_counter')));
+  }
+  if (checkedItems.has('kit_sink')) kitItems.push('Install stainless steel undermount sink' + n(getNote('kit_sink')));
+  if (checkedItems.has('kit_disposal')) kitItems.push('Install kitchen faucet (matte black) and garbage disposal' + n(getNote('kit_disposal')));
+
+  const apps = [];
+  if (checkedItems.has('app_fridge')) apps.push('Refrigerator');
+  if (checkedItems.has('app_range')) apps.push('Gas range / stove');
+  if (checkedItems.has('app_micro_otr')) apps.push('Microwave');
+  if (checkedItems.has('app_hood')) apps.push('Range hood');
+  if (checkedItems.has('app_dw')) apps.push('Dishwasher');
+  if (checkedItems.has('app_wd')) apps.push('Washer/dryer (' + getSelectVal('app_wd').split(' —')[0] + ')');
+  if (apps.length) kitItems.push('Install stainless steel appliances: ' + apps.join(', '));
+
+  if (checkedItems.has('kit_lights')) kitItems.push('Replace kitchen lights with new flush LED ceiling lights' + n(getNote('kit_lights')));
+  if (checkedItems.has('kit_canlights')) kitItems.push('Install can lights in kitchen' + n(getNote('kit_canlights')));
+  if (checkedItems.has('kit_fan_dining')) kitItems.push('Replace dining area light with ceiling fan' + n(getNote('kit_fan_dining')));
+
+  if (kitItems.length) {
+    sow += `KITCHEN\n${kitItems.map(i => `  • ${i}`).join('\n')}\n\n`;
+  }
+
+  // BATHROOM
+  const bathItems = [];
+  if (checkedItems.has('bath_tub_replace')) bathItems.push('Remove and replace tub with new 60×30 tub and surrounding tile; install shower door (matte black)' + n(getNote('bath_tub_replace')));
+  if (checkedItems.has('bath_tub_reglaze')) bathItems.push('Reglaze tub and surrounding tile (price with and without replacement option)' + n(getNote('bath_tub_reglaze')));
+  if (checkedItems.has('bath_shower_door') && !checkedItems.has('bath_tub_replace')) bathItems.push('Install matte black sliding shower door' + n(getNote('bath_shower_door')));
+  if (checkedItems.has('bath_shower_curtain')) bathItems.push('Install shower rod and curtain' + n(getNote('bath_shower_curtain')));
+  if (checkedItems.has('bath_shower_faucet')) bathItems.push('Install new shower faucet set — matte black (' + getSelectVal('bath_shower_faucet').split(' —')[0] + ')' + n(getNote('bath_shower_faucet')));
+  if (checkedItems.has('bath_toilet')) bathItems.push('Install new toilet' + n(getNote('bath_toilet')));
+  if (checkedItems.has('bath_vanity_replace')) bathItems.push('Install new vanity with matte black hardware' + n(getNote('bath_vanity_replace')));
+  if (checkedItems.has('bath_vanity_paint')) bathItems.push('Repaint vanity and reglaze sink; replace handles with matte black' + n(getNote('bath_vanity_paint')));
+  if (checkedItems.has('bath_vanity_faucet')) bathItems.push('Install matte black vanity sink faucet' + n(getNote('bath_vanity_faucet')));
+  if (checkedItems.has('bath_mirror')) bathItems.push('Install matte black framed mirror (' + getSelectVal('bath_mirror') + ')' + n(getNote('bath_mirror')));
+  if (checkedItems.has('bath_medcab')) bathItems.push('Install recessed medicine cabinet' + n(getNote('bath_medcab')));
+  if (checkedItems.has('bath_light')) bathItems.push('Install matte black vanity light fixture above vanity' + n(getNote('bath_light')));
+  if (checkedItems.has('bath_exhaust')) bathItems.push('Install bathroom exhaust fan' + n(getNote('bath_exhaust')));
+  if (checkedItems.has('bath_accessories')) bathItems.push('Install matte black bathroom accessories — towel bar, towel ring, hooks, toilet paper holder' + n(getNote('bath_accessories')));
+  if (checkedItems.has('bath_tile_trim')) bathItems.push('Install Schluter matte black tile edge trim' + n(getNote('bath_tile_trim')));
+
+  if (bathItems.length) {
+    sow += `BATHROOM\n${bathItems.map(i => `  • ${i}`).join('\n')}\n\n`;
+  }
+
+  // BEDROOMS / HALL / LIVING ROOM
+  const bedroomItems = [];
+  const numBeds = parseInt(document.getElementById('numBeds').value);
+  if (checkedItems.has('bed_closet_mirrors')) bedroomItems.push('Install closet mirror sliding doors (all bedrooms)' + n(getNote('bed_closet_mirrors')));
+  if (checkedItems.has('bed_ceil_fans')) bedroomItems.push(`Install one matte black ceiling fan with light in each bedroom (qty: ${numBeds})` + n(getNote('bed_ceil_fans')));
+  if (checkedItems.has('living_ceil_fan')) bedroomItems.push('Install ceiling fan in living room' + n(getNote('living_ceil_fan')));
+  if (checkedItems.has('hall_light')) bedroomItems.push('Install ceiling light in hallway' + n(getNote('hall_light')));
+  if (checkedItems.has('living_canlights')) bedroomItems.push('Install can lights in living room (6–8 recommended)' + n(getNote('living_canlights')));
+  if (checkedItems.has('gen_ac')) {
+    const acOpt = getSelectVal('gen_ac');
+    bedroomItems.push(acOpt.includes('not') ? 'A/C not required' : acOpt + ' (14,000 BTU 220V wall unit)' + n(getNote('gen_ac')));
+  }
+  if (checkedItems.has('gen_thermostat')) bedroomItems.push('Install Honeywell CT31A thermostat' + n(getNote('gen_thermostat')));
+  if (checkedItems.has('gen_heater')) bedroomItems.push('Paint wall heater matte black' + n(getNote('gen_heater')));
+
+  if (bedroomItems.length) {
+    sow += `BEDROOMS / HALL / LIVING ROOM\n${bedroomItems.map(i => `  • ${i}`).join('\n')}\n\n`;
+  }
+
+  // ADDITIONAL
+  if (addNotes) sow += `ADDITIONAL NOTES\n  ${addNotes}\n\n`;
+
+  sow += `${'─'.repeat(50)}\n`;
+  sow += `Generated by MBI Equity Partners Renovation Toolkit\n`;
+  sow += `Contact: Morgan Boukather Ryan — morgan@mbiequitypartners.com — 949.468.7026\n`;
+  sow += `Andrew Boukather — andrew@mbiequitypartners.com — 949.468.7069`;
+
+  document.getElementById('sow-output').textContent = sow;
+}
+
+function n(note) { return note ? `\n    → ${note}` : ''; }
+
+// ============================================================
+// MATERIAL LIST GENERATOR
+// ============================================================
+function generateMaterials() {
+  const numBeds = parseInt(document.getElementById('numBeds').value);
+  const rows = [];
+
+  // Helper
+  function row(cat, item, vendor, sku, qty, note='') {
+    rows.push({ cat, item, vendor, sku, qty: qty || 'TBD', note });
+  }
+
+  // FLOORING
+  const sqft = parseFloat(document.getElementById('m_sqft').value) || parseFloat(document.getElementById('unitSqft').value) || 0;
+  const lvpSF = sqft ? Math.ceil(sqft * 1.10) + ' SF' : 'Measure SF';
+  const baseLF = sqft ? Math.ceil(sqft * 0.38) + ' LF' : 'Measure LF';
+  const jcQty = sqft ? Math.ceil(sqft / 100) + ' bucket(s)' : 'TBD';
+  const fastQty = sqft ? Math.ceil(sqft / 150) + ' bag(s)' : 'TBD';
+  if (checkedItems.has('flooring_lvp')) row('FLOORING', 'SPC Luxury Vinyl Plank', 'CY Flooring', 'SPC-JW8005', lvpSF, '$1.59/sf cash');
+  if (checkedItems.has('flooring_base')) row('FLOORING', '3½" MDF Base Molding', 'CY Flooring', '830B 3+1/2"', baseLF, '$5.99/16LF cash');
+  if (checkedItems.has('demo_ceilings')) {
+    row('FLOORING', 'Joint Compound 3.5 gal bucket', 'Home Depot', 'TBD', jcQty, 'Scrape/skim ceilings');
+    row('FLOORING', 'FastSet / Setting Compound bag', 'Home Depot', 'TBD', fastQty, '');
+  }
+  if (checkedItems.has('flooring_level')) row('FLOORING', 'Self-Leveling Underlayment (50lb)', 'Home Depot', '1001967746', 'TBD bags', '');
+
+  // DOORS
+  if (checkedItems.has('door_replace') && !getSelectVal('door_replace').includes('Repaint')) {
+    const doorCount = document.getElementById('m_door_count').value || 'TBD';
+    row('DOORS', '6-Panel Hollow Core Door (30×80 standard)', 'Home Depot', '100027642', doorCount + ' doors', 'Masonite 61094 — verify sizes in Measurements tab');
+  }
+  if (checkedItems.has('door_hardware')) {
+    row('DOORS', 'Matte Black Passage Knob Set', 'Amazon', 'ASIN: B07C1XCL9Y', 'Per door', '');
+    row('DOORS', 'Matte Black Door Hinges (pack)', 'Amazon', 'ASIN: B09B1SP5L9', 'Per door (3 hinges)', '');
+    row('DOORS', 'Matte Black Spring Door Stops', 'Amazon', 'ASIN: B07V8FMK2J', 'TBD', '');
+  }
+  if (checkedItems.has('door_ext_locks')) row('DOORS', 'Matte Black Entry Set', 'Amazon', 'ASIN: B0C1VP22CZ', '1', '');
+  if (checkedItems.has('door_blinds')) {
+    const blindRows = document.querySelectorAll('#blinds_rows tr');
+    if (blindRows.length > 0) {
+      // Group by SKU
+      const blindMap = {};
+      blindRows.forEach(tr => {
+        const inputs = tr.querySelectorAll('input');
+        const skuSpan = tr.querySelector('.sku-tag');
+        if (!skuSpan) return;
+        const room = inputs[0]?.value || 'Window';
+        const w = inputs[1]?.value || '?';
+        const h = inputs[2]?.value || '48';
+        const qty = inputs[3]?.value || '1';
+        const sku = skuSpan.textContent.split(' ')[0];
+        if (!blindMap[sku]) blindMap[sku] = [];
+        blindMap[sku].push(room + ' ' + w + '"W×' + h + '"H (qty ' + qty + ')');
+      });
+      Object.entries(blindMap).forEach(([sku, rooms]) => {
+        row('DOORS', 'Cordless 1" Roller Blind — White', 'Home Depot', sku, rooms.length + ' window(s)', rooms.join(', '));
+      });
+    } else {
+      row('DOORS', 'White Cordless 1" Roller Blinds', 'Home Depot', 'See HD listing', 'Per window — add in Measurements tab', 'Cut to width');
+    }
+  }
+  if (checkedItems.has('kit_cab_hardware')) {
+    row('CABINET HARDWARE', 'Soft-Close Cabinet Hinges', 'Amazon', 'ASIN: B09M8FXVYR', 'TBD pairs', '');
+    row('CABINET HARDWARE', 'Matte Black Bar Pulls (Option A)', 'Amazon', 'ASIN: B0CJNXJ7K1', 'TBD', 'Price fluctuates — buy similar');
+    row('CABINET HARDWARE', 'Matte Black Bar Pulls (Option B)', 'Amazon', 'ASIN: B083FF32CF', 'TBD', 'Alt option');
+    row('CABINET HARDWARE', '2¼" Craftsman Primed MDF Casing', 'Home Depot', '306717308', 'TBD packs', 'HDFB473-DP; 35 LF/pack');
+  }
+  if (checkedItems.has('gen_thermostat') || checkedItems.has('gen_ac')) {
+    row('GENERAL', 'Honeywell CT31A Thermostat', 'Home Depot', '100400017', '1', '');
+  }
+  if (checkedItems.has('gen_ac')) row('GENERAL', '14,000 BTU 220V Wall A/C Unit', 'Home Depot', '1012544898', '1', '');
+  if (checkedItems.has('gen_smokedetect')) row('GENERAL', 'CO/Smoke Alarm (combo)', 'Home Depot', 'TBD', 'TBD qty', '');
+
+  // KITCHEN
+  if (checkedItems.has('kit_counter')) {
+    const ctOpt = getSelectVal('kit_counter');
+    if (ctOpt.includes('Island')) row('KITCHEN', 'White Quartz Countertop Island 110×42', 'ZH Stone', 'W028-11024', '1', 'Addy 909-487-6888; $530');
+    else if (ctOpt.includes('Backsplash only')) row('KITCHEN', 'White Quartz Backsplash 110×6', 'ZH Stone', 'W028-110x6-Back', '1', '$45');
+    else row('KITCHEN', 'White Quartz Countertop w/ Backsplash 110×26', 'ZH Stone', 'W028-11026-Combo', '1', 'Addy 909-487-6888; $310');
+  }
+  if (checkedItems.has('kit_cab_replace')) {
+    const cabType = document.getElementById('m_cab_type').value;
+    if (cabType === 'prefab') {
+      const baseQty = document.getElementById('calc_base_cabs').textContent.replace(' cabinets','') || 'TBD';
+      const upperQty = document.getElementById('calc_upper_cabs').textContent.replace(' cabinets','') || 'TBD';
+      row('KITCHEN', 'Hampton Bay 30" Unfinished Base Cabinet', 'Home Depot', '302970323', baseQty + ' base', 'KB30-UF');
+      if (upperQty !== 'TBD' && upperQty !== '—') row('KITCHEN', 'Upper Cabinet (size to fit)', 'Home Depot', 'TBD', upperQty + ' upper', 'Verify with contractor');
+    } else if (cabType === 'custom') {
+      row('KITCHEN', 'Custom Cabinets — Vendor Quote', document.getElementById('m_cab_vendor').value || 'TBD', 'Custom', 'Per quote', document.getElementById('m_cab_notes').value || '');
+    }
+  }
+  if (checkedItems.has('kit_sink')) {
+    row('KITCHEN', 'Stainless Steel Undermount Sink', 'ZH Stone', 'SQ-S', '1', '$95 — contact Addy');
+    row('KITCHEN', 'Matte Black Gooseneck Pull-Down Faucet', 'Amazon', 'ASIN: B08Z3M9HPM', '1', '');
+  }
+  if (checkedItems.has('kit_disposal')) row('KITCHEN', 'Standard Garbage Disposal', 'Amazon', 'ASIN: B000JQN7LY', '1', '');
+  if (checkedItems.has('kit_lights') || checkedItems.has('hall_light')) row('KITCHEN / LIGHTING', 'LED Flush Mount Ceiling Light', 'Amazon', 'ASIN: B0DF6XPZ9R', 'TBD qty', 'Kitchen, hallway, dining');
+
+  // BATHROOM
+  if (checkedItems.has('bath_tub_replace')) {
+    const tubW = parseFloat(document.getElementById('m_tub_w').value) || 60;
+    const tileH = parseFloat(document.getElementById('m_tile_h').value) || 60;
+    const tubD = parseFloat(document.getElementById('m_tub_d').value) || 32;
+    const rawSF = ((tubW * tileH) + 2 * (tubD * tileH)) / 144;
+    const tileSF = Math.ceil(rawSF * 1.15);
+    const tileCases = Math.ceil(tileSF / 11);
+    const trimLF = Math.ceil((tubW + 2 * tubD) / 12 * 1.1);
+    const groutBags = Math.ceil(tileSF / 50);
+    const mortarBags = Math.ceil(tileSF / 40);
+    const backerSheets = Math.ceil(tileSF / 15);
+    row('BATHROOM', '60×30 Bathtub', 'Home Depot', '314614199', '1', '');
+    row('BATHROOM', 'Daltile Glacier White 12×12 Wall Tile', 'Home Depot', '202519403', tileCases + ' cases (' + tileSF + ' SF)', '55001212HD1P2; 11sf/case');
+    row('BATHROOM', 'Tile Edge Trim — Schluter Schiene Black 3/8"', 'Home Depot', '202602045', trimLF + ' LF', 'A100AGSG');
+    row('BATHROOM', 'Polyblend Grout 25lb', 'Home Depot', 'TBD', groutBags + ' bag(s)', '');
+    row('BATHROOM', 'Tile Mortar 50lb', 'Home Depot', 'TBD', mortarBags + ' bag(s)', '');
+    row('BATHROOM', 'Hardie Backer Board 3×5 sheets', 'Home Depot', '100170507', backerSheets + ' sheets', '');
+  }
+  if (checkedItems.has('bath_shower_door') || checkedItems.has('bath_tub_replace')) row('BATHROOM', 'Matte Black Sliding Shower Door 56-60"W×58"H', 'Home Depot', '331783339', '1', '');
+  if (checkedItems.has('bath_shower_faucet')) {
+    const sfOpt = getSelectVal('bath_shower_faucet');
+    if (sfOpt.includes('3-Handle')) row('BATHROOM', '3-Handle Shower Faucet Set — Matte Black', 'Amazon', 'ASIN: B0CGQQK9CB', '1', '');
+    else if (sfOpt.includes('1-Handle')) row('BATHROOM', '1-Handle Shower Faucet Set — Matte Black', 'Amazon', 'ASIN: B0B6CL7YTS', '1', '');
+    else if (sfOpt.includes('Head Neck')) {
+      row('BATHROOM', 'Replacement Shower Head Neck', 'Amazon', 'ASIN: B0C3HBW1GD', '1', 'Reglaze option');
+      row('BATHROOM', 'Replacement 3-Piece Shower Knob', 'Amazon', 'ASIN: B0F26CHP6T', '1', 'Reglaze option');
+    }
+    row('BATHROOM', 'Drain Kit', 'Amazon', 'ASIN: B0D5Y5P5SF', '1', '');
+    row('BATHROOM', 'Tub Spout', 'Amazon', 'ASIN: B0CN16KYGC', '1', '');
+  }
+  if (checkedItems.has('bath_toilet')) row('BATHROOM', 'Toilet — Standard', 'Home Depot', 'TBD', '1', '');
+  if (checkedItems.has('bath_vanity_replace')) {
+    const vanW = document.getElementById('m_vanity_w').value;
+    const vanSKU = vanW === '30' ? '203486570' : 'TBD — ' + vanW + '" vanity';
+    row('BATHROOM', 'White Vanity (' + vanW + '")', 'Home Depot', vanSKU, '1', vanW === '30' ? 'GB30P2-WH' : 'Verify size in Measurements tab');
+  }
+  if (checkedItems.has('bath_vanity_faucet')) row('BATHROOM', 'Matte Black Vanity Sink Faucet', 'Amazon', 'ASIN: B07SXK14HQ', '1', '');
+  if (checkedItems.has('bath_mirror')) {
+    const mOpt = getSelectVal('bath_mirror');
+    const mAsin = mOpt.includes('30×22') ? 'B0CQJRRZPG' : mOpt.includes('30×40') ? 'B0CV52NVG5' : 'B0CPL7G5YN';
+    row('BATHROOM', `Matte Black Frame Mirror (${mOpt.split(' —')[0]})`, 'Amazon', `ASIN: ${mAsin}`, '1 per bath', '');
+  }
+  if (checkedItems.has('bath_medcab')) row('BATHROOM', 'Zenith 16×26 Medicine Cabinet', 'Home Depot', '100191089', '1 per bath', 'SKU 1806');
+  if (checkedItems.has('bath_light')) {
+    const lOpt = getSelectVal('bath_light');
+    row('BATHROOM', lOpt.includes('4-Light') ? 'Matte Black 4-Light Vanity Fixture' : 'Matte Black 3-Light Vanity Fixture', 'Amazon',
+      lOpt.includes('4-Light') ? 'ASIN: B0F18VKVXX' : 'ASIN: B0963M4H4J', '1 per bath', '');
+  }
+  if (checkedItems.has('bath_exhaust')) row('BATHROOM', 'Broan-NuTone 50 CFM Exhaust Fan', 'Home Depot', '100081599', '1 per bath', 'SKU 696N');
+  if (checkedItems.has('bath_accessories')) {
+    const aOpt = getSelectVal('bath_accessories');
+    const aAsin = aOpt.includes('Full') ? 'B0CCD5RWDB' : aOpt.includes('Half') ? 'B0C5D6Z9FS' : 'B0DH1ZKD17';
+    row('BATHROOM', `Matte Black Bath Accessory Set (${aOpt.split(' —')[0]})`, 'Amazon', `ASIN: ${aAsin}`, '1 per bath', '');
+  }
+  row('BATHROOM', 'Light Bulbs — LED A19 Standard', 'Amazon', 'ASIN: B0D4QXLGK6', 'TBD qty', 'All fixtures');
+
+  // BEDROOM
+  if (checkedItems.has('bed_closet_mirrors')) row('BEDROOM', 'Wardrobe Savoy Mirror Door 59×80½', 'Home Depot', '202089907', `${numBeds} (verify opening dims)`, 'SAV-5980WHMNC2U');
+  if (checkedItems.has('bed_ceil_fans')) row('BEDROOM', 'Modern 3-Blade Matte Black Ceiling Fan w/ Light', 'Amazon', 'ASIN: B0DTKHBK68', `${numBeds} (1 per bedroom)`, 'Price fluctuates');
+  if (checkedItems.has('living_ceil_fan')) row('BEDROOM', 'Ceiling Fan — Living Room', 'Amazon', 'ASIN: B0DTKHBK68', '1', 'Or similar style');
+
+  // APPLIANCES
+  if (checkedItems.has('app_fridge')) {
+    const opt = getSelectVal('app_fridge');
+    const sku = opt.includes('Vissani') ? '1006460551' : '1005852334';
+    row('APPLIANCES', opt.split(' —')[0], 'Home Depot', sku, '1', '');
+  }
+  if (checkedItems.has('app_range')) {
+    const opt = getSelectVal('app_range');
+    const sku = opt.includes('GE') ? '1012075662' : '1010323197';
+    row('APPLIANCES', opt.split(' —')[0], 'Home Depot', sku, '1', '');
+  }
+  if (checkedItems.has('app_micro_otr')) {
+    const opt = getSelectVal('app_micro_otr');
+    const sku = opt.includes('Vissani') ? '1010954456' : '1001969212';
+    row('APPLIANCES', opt.split(' —')[0], 'Home Depot', sku, '1', '');
+  }
+  if (checkedItems.has('app_hood')) {
+    const opt = getSelectVal('app_hood');
+    const sku = opt.includes('Whirlpool') ? '1001000147' : '1003991504';
+    row('APPLIANCES', opt.split(' —')[0], 'Home Depot', sku, '1', '');
+  }
+  if (checkedItems.has('app_dw')) {
+    const opt = getSelectVal('app_dw');
+    const sku = opt.includes('Frigidaire') ? '1003404850' : '1008493078';
+    row('APPLIANCES', opt.split(' —')[0], 'Home Depot', sku, '1', '');
+  }
+  if (checkedItems.has('app_wd')) {
+    const opt = getSelectVal('app_wd');
+    let sku = '1012165319';
+    if (opt.includes('Equator')) sku = '1009381435';
+    else if (opt.includes('Small')) sku = '1003012281';
+    else if (opt.includes('Large')) sku = '1003951534';
+    else if (opt.includes('Separate')) sku = '1008461791 + 1008472366';
+    row('APPLIANCES', opt.split(' —')[0], 'Home Depot', sku, '1', '');
+  }
+
+  // Render table
+  let html = `<div style="overflow-x:auto;"><table class="mat-table">
+    <thead><tr>
+      <th>Category</th><th>Item</th><th>Vendor</th><th>SKU / ASIN</th><th>Qty</th><th>Notes</th>
+    </tr></thead><tbody>`;
+
+  let lastCat = '';
+  rows.forEach(r => {
+    if (r.cat !== lastCat) {
+      html += `<tr class="cat-row"><td colspan="6">${r.cat}</td></tr>`;
+      lastCat = r.cat;
+    }
+    const vClass = r.vendor === 'Home Depot' ? 'vendor-hd' : r.vendor === 'Amazon' ? 'vendor-amz' : r.vendor === 'CY Flooring' ? 'vendor-cy' : 'vendor-zh';
+    html += `<tr>
+      <td></td>
+      <td style="font-weight:600;">${r.item}</td>
+      <td><span class="vendor-tag ${vClass}">${r.vendor === 'Home Depot' ? 'HD' : r.vendor === 'CY Flooring' ? 'CY' : r.vendor === 'ZH Stone' ? 'ZH' : 'AMZ'}</span></td>
+      <td><span class="sku-tag">${r.sku}</span></td>
+      <td style="font-weight:600;">${r.qty}</td>
+      <td style="color:#6b7a8d;font-size:11px;">${r.note}</td>
+    </tr>`;
+  });
+  html += `</tbody></table></div>`;
+  document.getElementById('materials-output').innerHTML = html;
+}
+
+// ============================================================
+// PURCHASE ORDER GENERATOR
+// ============================================================
+function generateOrders() {
+  const addr = document.getElementById('propAddress').value || '[Property]';
+  const unit = document.getElementById('unitNum').value || '[Unit]';
+  const numBeds = parseInt(document.getElementById('numBeds').value);
+  const label = `${addr}${unit ? ' ' + unit : ''}`;
+
+  // ---- HD MATERIALS ----
+  const hdMat = [];
+  if (checkedItems.has('door_replace') && !getSelectVal('door_replace').includes('Repaint')) hdMat.push({ sku: '100027642', desc: '6-Panel Hollow Core Door 30×80', qty: 'TBD' });
+  if (checkedItems.has('door_blinds')) hdMat.push({ sku: 'Varies by window', desc: 'White Cordless 1" Roller Blinds (cut to width)', qty: 'Per window' });
+  if (checkedItems.has('kit_cab_replace')) hdMat.push({ sku: '302970323', desc: 'Hampton Bay 30" Unfinished Base Cabinet', qty: 'TBD' });
+  if (checkedItems.has('kit_cab_hardware')) hdMat.push({ sku: '306717308', desc: '2¼" Craftsman Primed MDF Casing (35LF/pack)', qty: 'TBD packs' });
+  if (checkedItems.has('gen_ac')) hdMat.push({ sku: '1012544898', desc: '14,000 BTU 220V Wall A/C Unit', qty: '1' });
+  if (checkedItems.has('gen_thermostat')) hdMat.push({ sku: '100400017', desc: 'Honeywell CT31A Thermostat', qty: '1' });
+  if (checkedItems.has('bath_tub_replace')) {
+    hdMat.push({ sku: '314614199', desc: '60×30 Bathtub', qty: '1' });
+    hdMat.push({ sku: '202519403', desc: 'Daltile Glacier White 12×12 Tile (11sf/case)', qty: 'TBD cases' });
+    hdMat.push({ sku: '202602045', desc: 'Schluter Schiene Black 3/8" Tile Trim', qty: 'TBD LF' });
+  }
+  if (checkedItems.has('bath_shower_door') || checkedItems.has('bath_tub_replace')) hdMat.push({ sku: '331783339', desc: 'Matte Black Sliding Shower Door 56-60"W×58"H', qty: '1' });
+  if (checkedItems.has('bath_vanity_replace')) hdMat.push({ sku: '203486570', desc: 'Glacier Bay 31" White Vanity', qty: '1' });
+  if (checkedItems.has('bath_medcab')) hdMat.push({ sku: '100191089', desc: 'Zenith 16×26 Medicine Cabinet', qty: '1 per bath' });
+  if (checkedItems.has('bath_exhaust')) hdMat.push({ sku: '100081599', desc: 'Broan-NuTone 50 CFM Exhaust Fan', qty: '1 per bath' });
+  if (checkedItems.has('bath_toilet')) hdMat.push({ sku: 'TBD', desc: 'Standard Toilet', qty: '1' });
+  if (checkedItems.has('bed_closet_mirrors')) hdMat.push({ sku: '202089907', desc: 'Wardrobe Savoy Mirror Door 59×80½', qty: `${numBeds} (verify dims)` });
+  if (checkedItems.has('flooring_level')) hdMat.push({ sku: '1001967746', desc: 'Sika Self-Leveling Underlayment 50lb', qty: 'TBD bags' });
+
+  let hdMatText = `HOME DEPOT — MATERIALS ORDER\nProperty: ${label}\n${'─'.repeat(45)}\nSKU\t\t\tQTY\t\tDESCRIPTION\n${'─'.repeat(45)}\n`;
+  hdMat.forEach(r => { hdMatText += `${r.sku.padEnd(24)}${String(r.qty).padEnd(16)}${r.desc}\n`; });
+  document.getElementById('hd-materials-output').textContent = hdMatText;
+
+  // ---- HD PAINT ----
+  let hdPaint = `HOME DEPOT — PAINT ORDER\nProperty: ${label}\n${'─'.repeat(45)}\nSKU\t\t\tQTY\t\tDESCRIPTION\n${'─'.repeat(45)}\n`;
+  hdPaint += `(Interior paint — specify color/finish)\t\tTBD gallons\tInterior Wall Paint\n`;
+  hdPaint += `(Ceiling paint — flat white)\t\t\tTBD gallons\tCeiling Paint\n`;
+  hdPaint += `1005167203\t\t\tTBD\t\tRust-Oleum Flat Black Spray (heater, fixtures)\n`;
+  document.getElementById('hd-paint-output').textContent = hdPaint;
+
+  // ---- HD APPLIANCES ----
+  const hdApp = [];
+  if (checkedItems.has('app_fridge')) {
+    const opt = getSelectVal('app_fridge');
+    hdApp.push({ sku: opt.includes('Vissani') ? '1006460551' : '1005852334', desc: opt.split(' —')[0], qty: '1' });
+  }
+  if (checkedItems.has('app_range')) {
+    const opt = getSelectVal('app_range');
+    hdApp.push({ sku: opt.includes('GE') ? '1012075662' : '1010323197', desc: opt.split(' —')[0], qty: '1' });
+  }
+  if (checkedItems.has('app_micro_otr')) {
+    const opt = getSelectVal('app_micro_otr');
+    hdApp.push({ sku: opt.includes('Vissani') ? '1010954456' : '1001969212', desc: opt.split(' —')[0], qty: '1' });
+  }
+  if (checkedItems.has('app_hood')) {
+    const opt = getSelectVal('app_hood');
+    hdApp.push({ sku: opt.includes('Whirlpool') ? '1001000147' : '1003991504', desc: opt.split(' —')[0], qty: '1' });
+  }
+  if (checkedItems.has('app_dw')) {
+    const opt = getSelectVal('app_dw');
+    hdApp.push({ sku: opt.includes('Frigidaire') ? '1003404850' : '1008493078', desc: opt.split(' —')[0], qty: '1' });
+  }
+  if (checkedItems.has('app_wd')) {
+    const opt = getSelectVal('app_wd');
+    let sku = '1012165319';
+    if (opt.includes('Equator')) sku = '1009381435';
+    else if (opt.includes('Small')) sku = '1003012281';
+    else if (opt.includes('Large')) sku = '1003951534';
+    else if (opt.includes('Separate')) sku = '1008461791 + 1008472366';
+    hdApp.push({ sku, desc: opt.split(' —')[0], qty: '1 set' });
+  }
+
+  let hdAppText = `HOME DEPOT — APPLIANCE ORDER\nProperty: ${label}\n${'─'.repeat(45)}\nSKU\t\t\tQTY\t\tDESCRIPTION\n${'─'.repeat(45)}\n`;
+  hdApp.forEach(r => { hdAppText += `${r.sku.padEnd(24)}${String(r.qty).padEnd(16)}${r.desc}\n`; });
+  document.getElementById('hd-appliances-output').textContent = hdAppText;
+
+  // ---- AMAZON ----
+  const amzItems = [];
+  if (checkedItems.has('door_hardware')) {
+    amzItems.push({ asin: 'B07C1XCL9Y', desc: 'Matte Black Passage Knob Set', qty: 'Per door' });
+    amzItems.push({ asin: 'B09B1SP5L9', desc: 'Matte Black Door Hinges', qty: 'Per door (3 hinges)' });
+    amzItems.push({ asin: 'B07V8FMK2J', desc: 'Matte Black Spring Door Stops', qty: 'TBD' });
+  }
+  if (checkedItems.has('door_ext_locks')) amzItems.push({ asin: 'B0C1VP22CZ', desc: 'Matte Black Exterior Entry Set', qty: '1' });
+  if (checkedItems.has('kit_cab_hardware')) {
+    amzItems.push({ asin: 'B09M8FXVYR', desc: 'Soft-Close Cabinet Hinges', qty: 'TBD pairs' });
+    amzItems.push({ asin: 'B0CJNXJ7K1', desc: 'Matte Black Bar Pulls — Option A', qty: 'TBD' });
+  }
+  if (checkedItems.has('kit_sink')) amzItems.push({ asin: 'B08Z3M9HPM', desc: 'Matte Black Gooseneck Pull-Down Faucet', qty: '1' });
+  if (checkedItems.has('kit_disposal')) amzItems.push({ asin: 'B000JQN7LY', desc: 'Standard Garbage Disposal', qty: '1' });
+  if (checkedItems.has('kit_lights') || checkedItems.has('hall_light')) amzItems.push({ asin: 'B0DF6XPZ9R', desc: 'LED Flush Mount Ceiling Light', qty: 'TBD' });
+  if (checkedItems.has('bath_shower_faucet')) {
+    const sfOpt = getSelectVal('bath_shower_faucet');
+    if (sfOpt.includes('3-Handle')) amzItems.push({ asin: 'B0CGQQK9CB', desc: '3-Handle Shower Faucet Set — Matte Black', qty: '1' });
+    else if (sfOpt.includes('1-Handle')) amzItems.push({ asin: 'B0B6CL7YTS', desc: '1-Handle Shower Faucet Set — Matte Black', qty: '1' });
+    else {
+      amzItems.push({ asin: 'B0C3HBW1GD', desc: 'Replacement Shower Head Neck', qty: '1' });
+      amzItems.push({ asin: 'B0F26CHP6T', desc: 'Replacement 3-Piece Shower Knob', qty: '1' });
+    }
+    amzItems.push({ asin: 'B0D5Y5P5SF', desc: 'Drain Kit', qty: '1' });
+    amzItems.push({ asin: 'B0CN16KYGC', desc: 'Tub Spout', qty: '1' });
+  }
+  if (checkedItems.has('bath_vanity_faucet')) amzItems.push({ asin: 'B07SXK14HQ', desc: 'Matte Black Vanity Sink Faucet', qty: '1 per bath' });
+  if (checkedItems.has('bath_mirror')) {
+    const mOpt = getSelectVal('bath_mirror');
+    const mAsin = mOpt.includes('30×22') ? 'B0CQJRRZPG' : mOpt.includes('30×40') ? 'B0CV52NVG5' : 'B0CPL7G5YN';
+    amzItems.push({ asin: mAsin, desc: `Matte Black Frame Mirror (${mOpt.split(' —')[0]})`, qty: '1 per bath' });
+  }
+  if (checkedItems.has('bath_light')) {
+    const lOpt = getSelectVal('bath_light');
+    amzItems.push({ asin: lOpt.includes('4-Light') ? 'B0F18VKVXX' : 'B0963M4H4J', desc: lOpt.includes('4-Light') ? 'Matte Black 4-Light Vanity Fixture' : 'Matte Black 3-Light Vanity Fixture', qty: '1 per bath' });
+  }
+  if (checkedItems.has('bath_accessories')) {
+    const aOpt = getSelectVal('bath_accessories');
+    amzItems.push({ asin: aOpt.includes('Full') ? 'B0CCD5RWDB' : aOpt.includes('Half') ? 'B0C5D6Z9FS' : 'B0DH1ZKD17', desc: `Bath Accessory Set (${aOpt.split(' —')[0]})`, qty: '1 per bath' });
+  }
+  amzItems.push({ asin: 'B0D4QXLGK6', desc: 'LED A19 Standard Bulbs', qty: 'TBD qty' });
+  if (checkedItems.has('bed_ceil_fans')) amzItems.push({ asin: 'B0DTKHBK68', desc: 'Modern 3-Blade Matte Black Ceiling Fan', qty: `${numBeds + (checkedItems.has('living_ceil_fan') ? 1 : 0)}` });
+
+  let amzText = `AMAZON ORDER LIST\nProperty: ${label}\n${'─'.repeat(45)}\nASIN\t\t\tQTY\t\tDESCRIPTION\n${'─'.repeat(45)}\n`;
+  amzItems.forEach(r => { amzText += `${r.asin.padEnd(24)}${String(r.qty).padEnd(16)}${r.desc}\n`; });
+  document.getElementById('amazon-output').textContent = amzText;
+
+  // ---- OTHER VENDORS ----
+  let vendText = `OTHER VENDOR ORDERS\nProperty: ${label}\n${'─'.repeat(45)}\n`;
+  if (checkedItems.has('flooring_lvp') || checkedItems.has('flooring_base')) {
+    vendText += `\nCY FLOORING — 1228 Compton Ave, LA 90021 | 213-806-9901 | Pay in cash for best pricing\n`;
+    if (checkedItems.has('flooring_lvp')) vendText += `  SKU: SPC-JW8005   QTY: ___ SF   SPC Luxury Vinyl Plank ($1.59/sf)\n`;
+    if (checkedItems.has('flooring_base')) vendText += `  SKU: 830B 3+1/2"  QTY: ___ LF   3½" MDF Base Molding ($5.99/16LF)\n`;
+  }
+  if (checkedItems.has('kit_counter') || checkedItems.has('kit_sink')) {
+    vendText += `\nZH STONE — 1655 E Mission Blvd, Pomona 91766 | Contact: Addy 909-487-6888\n`;
+    if (checkedItems.has('kit_counter')) {
+      const ctOpt = getSelectVal('kit_counter');
+      if (ctOpt.includes('Island')) vendText += `  SKU: W028-11024      QTY: 1     White Quartz Island 110×42 ($530)\n`;
+      else if (ctOpt.includes('Backsplash')) vendText += `  SKU: W028-110x6-Back QTY: 1     White Quartz Backsplash 110×6 ($45)\n`;
+      else vendText += `  SKU: W028-11026-Combo QTY: 1    White Quartz Countertop w/ Backsplash 110×26 ($310)\n`;
+    }
+    if (checkedItems.has('kit_sink')) vendText += `  SKU: SQ-S            QTY: 1     Stainless Steel Undermount Sink ($95)\n`;
+    vendText += `  NOTE: Countertops are templated and fabricated — allow lead time.\n`;
+  }
+  document.getElementById('vendors-output').textContent = vendText;
+}
+
+
+
+// ============================================================
+// DOWNLOAD FUNCTIONS
+// ============================================================
+
+function getUnitLabel() {
+  const addr = document.getElementById('propAddress').value || 'Property';
+  const unit = document.getElementById('unitNum').value || '';
+  const date = document.getElementById('sowDate').value || new Date().toISOString().split('T')[0];
+  return { addr, unit, date, label: [addr, unit].filter(Boolean).join(' ') };
+}
+
+// ── SOW → Word .doc ─────────────────────────────────────────
+function downloadSOWasDoc() {
+  const sowText = document.getElementById('sow-output').textContent;
+  if (!sowText || sowText.includes('Click')) { alert('Generate the SOW first.'); return; }
+  const { addr, unit, date, label } = getUnitLabel();
+
+  // Parse plain-text SOW into sections
+  const lines = sowText.split('\n');
+  let sections = [];
+  let current = null;
+  const sectionHeadings = ['GENERAL','INTERIOR DOORS','KITCHEN','BATHROOM','BEDROOMS','ADDITIONAL'];
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('─') || trimmed.startsWith('MBI') || trimmed.startsWith('Contact') || trimmed.startsWith('Generated') || trimmed.startsWith('Andrew') || trimmed.startsWith('Morgan B')) return;
+    if (sectionHeadings.some(h => trimmed.startsWith(h))) {
+      if (current) sections.push(current);
+      current = { heading: trimmed, items: [] };
+    } else if (trimmed.startsWith('•') || trimmed.startsWith('•')) {
+      if (current) current.items.push(trimmed.replace(/^[••]\s*/, ''));
+    } else if (trimmed.startsWith('Property:') || trimmed.startsWith('Unit:') || trimmed.startsWith('Date:') || trimmed.startsWith('Bedrooms:')) {
+      // skip — we handle these in the header
+    }
+  });
+  if (current && current.items.length) sections.push(current);
+
+  // Build Word-compatible HTML
+  let body = `
+    <div style="border-bottom:3px solid #e05c2a;padding-bottom:8pt;margin-bottom:16pt;">
+      <p style="font-size:22pt;font-weight:bold;color:#0d1b2e;margin:0;">SCOPE OF WORK</p>
+      <p style="font-size:11pt;color:#e05c2a;font-weight:bold;margin:2pt 0 0;">MBI EQUITY PARTNERS</p>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16pt;font-size:10pt;">
+      <tr><td style="padding:4pt 8pt;background:#f4f6f9;width:120pt;font-weight:bold;color:#6b7a8d;text-transform:uppercase;font-size:9pt;">Property</td><td style="padding:4pt 8pt;font-weight:bold;">${addr}</td></tr>
+      <tr><td style="padding:4pt 8pt;background:#f4f6f9;font-weight:bold;color:#6b7a8d;text-transform:uppercase;font-size:9pt;">Unit</td><td style="padding:4pt 8pt;">${unit}</td></tr>
+      <tr><td style="padding:4pt 8pt;background:#f4f6f9;font-weight:bold;color:#6b7a8d;text-transform:uppercase;font-size:9pt;">Date</td><td style="padding:4pt 8pt;">${date}</td></tr>
+      <tr><td style="padding:4pt 8pt;background:#f4f6f9;font-weight:bold;color:#6b7a8d;text-transform:uppercase;font-size:9pt;">Bedrooms</td><td style="padding:4pt 8pt;">${document.getElementById('numBeds').value} BD / ${document.getElementById('numBaths').value.replace('full',' Full').replace('half',' + ½')}</td></tr>
+      ${document.getElementById('unitSqft').value ? '<tr><td style="padding:4pt 8pt;background:#f4f6f9;font-weight:bold;color:#6b7a8d;text-transform:uppercase;font-size:9pt;">Unit SqFt</td><td style="padding:4pt 8pt;">' + document.getElementById('unitSqft').value + ' SF</td></tr>' : ''}
+    </table>`;
+
+  sections.forEach(sec => {
+    body += `<p style="font-size:12pt;font-weight:bold;color:#0d1b2e;background:#f4f6f9;padding:5pt 8pt;border-left:3pt solid #e05c2a;margin:14pt 0 6pt;">${sec.heading}</p><ul style="margin:0 0 10pt 0;padding-left:18pt;">`;
+    sec.items.forEach(item => {
+      // Handle sub-notes (lines starting with →)
+      if (item.startsWith('→')) {
+        body += `<li style="font-size:10pt;color:#6b7a8d;margin:2pt 0;list-style-type:circle;">${item.replace('→','').trim()}</li>`;
+      } else {
+        body += `<li style="font-size:10pt;color:#1a1a2e;margin:4pt 0;">${item}</li>`;
+      }
+    });
+    body += `</ul>`;
+  });
+
+  body += `
+    <p style="margin-top:24pt;border-top:1pt solid #d1d9e0;padding-top:8pt;font-size:9pt;color:#6b7a8d;">
+      Generated by MBI Equity Partners Renovation Toolkit &nbsp;|&nbsp;
+      Morgan Boukather Ryan &mdash; morgan@mbiequitypartners.com &mdash; 949.468.7026 &nbsp;|&nbsp;
+      Andrew Boukather &mdash; andrew@mbiequitypartners.com &mdash; 949.468.7069
+    </p>`;
+
+  const docHTML = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="utf-8">
+  <style>
+    @page { margin: 1in; }
+    body { font-family: Arial, sans-serif; }
+  </style>
+  </head><body>${body}</body></html>`;
+
+  const blob = new Blob([docHTML], { type: 'application/msword;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `SOW_${addr.replace(/[^a-zA-Z0-9]/g,'_')}_${unit.replace(/[^a-zA-Z0-9]/g,'_')}_${date}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Material List → CSV ──────────────────────────────────────
+function downloadMaterialCSV() {
+  const table = document.querySelector('#materials-output table');
+  if (!table) { alert('Generate the material list first.'); return; }
+  const { addr, unit, date } = getUnitLabel();
+
+  let csv = 'MBI EQUITY PARTNERS — MATERIAL ORDER LIST\n';
+  csv += 'Property:,' + addr + '\n';
+  csv += 'Unit:,' + unit + '\n';
+  csv += 'Date:,' + date + '\n\n';
+
+  const rows = table.querySelectorAll('tr');
+  rows.forEach(row => {
+    const isCatRow = row.querySelector('td[colspan]');
+    if (isCatRow) {
+      csv += '\n' + isCatRow.textContent.trim() + '\n';
+      return;
+    }
+    const cells = Array.from(row.querySelectorAll('th, td'));
+    if (!cells.length) return;
+    const rowData = cells.map(cell => {
+      let text = cell.textContent.trim().replace(/,/g, ';').replace(/\n/g, ' ');
+      return '"' + text + '"';
+    });
+    // Skip the empty first column in data rows
+    const filtered = rowData.filter((_, i) => i !== 0);
+    if (filtered.some(d => d !== '""')) csv += filtered.join(',') + '\n';
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Materials_${addr.replace(/[^a-zA-Z0-9]/g,'_')}_${unit.replace(/[^a-zA-Z0-9]/g,'_')}_${date}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// MEASUREMENTS TAB
+// ============================================================
+function recalcMeasurements() {
+  const sqft = parseFloat(document.getElementById('m_sqft').value) || parseFloat(document.getElementById('unitSqft').value) || 0;
+  // Sync sqft fields
+  if (document.getElementById('m_sqft').value === '' && document.getElementById('unitSqft').value)
+    document.getElementById('m_sqft').value = document.getElementById('unitSqft').value;
+  if (document.getElementById('unitSqft').value === '' && document.getElementById('m_sqft').value)
+    document.getElementById('unitSqft').value = document.getElementById('m_sqft').value;
+
+  if (!sqft) return;
+  const lvp = Math.ceil(sqft * 1.10);
+  const baseLF = Math.ceil(sqft * 0.38);
+  const jcBuckets = Math.ceil(sqft / 100);
+  const fastBags = Math.ceil(sqft / 150);
+  document.getElementById('calc_lvp_sf').textContent = lvp + ' SF';
+  document.getElementById('calc_base_lf').textContent = baseLF + ' LF (estimate)';
+  document.getElementById('calc_jc').textContent = jcBuckets + ' bucket(s)';
+  document.getElementById('calc_fast').textContent = fastBags + ' bag(s)';
+  calcTileMaterials();
+}
+
+function calcCabinets() {
+  const baseLF = parseFloat(document.getElementById('m_cab_base_lf').value) || 0;
+  const upperLF = parseFloat(document.getElementById('m_cab_upper_lf').value) || 0;
+  const baseCount = Math.ceil(baseLF * 12 / 30);
+  const upperCount = Math.ceil(upperLF * 12 / 30);
+  document.getElementById('calc_base_cabs').textContent = baseCount ? baseCount + ' cabinets' : '—';
+  document.getElementById('calc_upper_cabs').textContent = upperCount ? upperCount + ' cabinets' : '—';
+}
+
+function toggleCabFields() {
+  const type = document.getElementById('m_cab_type').value;
+  document.getElementById('prefab_fields').style.display = type === 'prefab' ? '' : 'none';
+  document.getElementById('custom_fields').style.display = type === 'custom' ? '' : 'none';
+}
+
+function calcTileMaterials() {
+  const tubW = parseFloat(document.getElementById('m_tub_w').value) || 60;
+  const tileH = parseFloat(document.getElementById('m_tile_h').value) || 60;
+  const tubD = parseFloat(document.getElementById('m_tub_d').value) || 32;
+  // 3-wall surround: back wall (tubW × tileH) + 2 side walls (tubD × tileH)
+  const rawSF = ((tubW * tileH) + 2 * (tubD * tileH)) / 144;
+  const totalSF = Math.ceil(rawSF * 1.15);
+  const cases = Math.ceil(totalSF / 11);
+  const trimLF = Math.ceil((tubW + 2 * tubD) / 12 * 1.1);
+  const grout = Math.ceil(totalSF / 50);
+  const mortar = Math.ceil(totalSF / 40);
+  const backer = Math.ceil(totalSF / 15);
+  document.getElementById('calc_tile_sf').textContent = totalSF + ' SF';
+  document.getElementById('calc_tile_cases').textContent = cases + ' cases';
+  document.getElementById('calc_trim_lf').textContent = trimLF + ' LF';
+  document.getElementById('calc_grout').textContent = grout + ' bag(s)';
+  document.getElementById('calc_mortar').textContent = mortar + ' bag(s)';
+  document.getElementById('calc_backer').textContent = backer + ' sheets';
+}
+
+function updateVanitySKU() {
+  const w = document.getElementById('m_vanity_w').value;
+  const skus = { '24': 'TBD — 24" white vanity', '30': '203486570 (GB30P2-WH)', '36': 'TBD — 36" white vanity', '42': 'TBD — 42" white vanity', '48': 'TBD — 48" white vanity', '60': 'TBD — 60" white vanity' };
+  document.getElementById('m_vanity_sku').value = skus[w] || 'TBD';
+}
+
+function updateShowerDoorSKU() {
+  const w = parseFloat(document.getElementById('m_shower_w').value) || 0;
+  // Could show warning if outside 56-60" range
+}
+
+// DOOR TABLE
+function buildDoorTable() {
+  const count = parseInt(document.getElementById('m_door_count').value) || 0;
+  const container = document.getElementById('door_table_container');
+  const doorNames = ['Bedroom 1','Bedroom 2','Bedroom 3','Bathroom 1','Bathroom 2','Closet','Laundry','Hall','Other'];
+  if (!count) { container.innerHTML = ''; return; }
+  let html = '<table class="door-table"><thead><tr><th>#</th><th>Door Location</th><th>Width × Height</th><th>Type</th><th>HD SKU</th></tr></thead><tbody>';
+  for (let i = 0; i < count; i++) {
+    const name = doorNames[i] || ('Door ' + (i+1));
+    html += `<tr>
+      <td>${i+1}</td>
+      <td><input type="text" value="${name}" placeholder="Location"></td>
+      <td><select onchange="updateDoorSKU(this)">
+        <option value="100027642">30" × 80" (standard)</option>
+        <option value="TBD-28x80">28" × 80"</option>
+        <option value="TBD-32x80">32" × 80"</option>
+        <option value="TBD-36x80">36" × 80"</option>
+        <option value="TBD-custom">Custom — measure to order</option>
+      </select></td>
+      <td><select>
+        <option>Hollow Core</option>
+        <option>Solid Core</option>
+      </select></td>
+      <td><span class="sku-tag door-sku-${i}">100027642</span></td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function updateDoorSKU(sel) {
+  const row = sel.closest('tr');
+  const skuSpan = row.querySelector('[class*="door-sku"]');
+  if (skuSpan) skuSpan.textContent = sel.value;
+}
+
+// BLINDS TABLE
+let blindRowCount = 0;
+function addBlindRow(room='', width='', height='48', qty='1') {
+  const tbody = document.getElementById('blinds_rows');
+  const id = blindRowCount++;
+  const sku = getBlindSKU(parseFloat(width));
+  const row = document.createElement('tr');
+  row.id = 'blind_row_' + id;
+  row.innerHTML = `
+    <td><input type="text" value="${room}" placeholder="e.g. Living Room" style="width:100%;border:1px solid #d1d9e0;border-radius:4px;padding:5px 7px;font-size:12px;"></td>
+    <td><input type="number" value="${width}" placeholder="in" style="width:70px;border:1px solid #d1d9e0;border-radius:4px;padding:5px 7px;font-size:12px;" oninput="updateBlindSKU(this, ${id})"></td>
+    <td><input type="number" value="${height}" placeholder="in" style="width:70px;border:1px solid #d1d9e0;border-radius:4px;padding:5px 7px;font-size:12px;"></td>
+    <td><input type="number" value="${qty}" min="1" style="width:50px;border:1px solid #d1d9e0;border-radius:4px;padding:5px 7px;font-size:12px;"></td>
+    <td><span class="sku-tag" id="blind_sku_${id}">${sku}</span></td>
+    <td><button onclick="document.getElementById('blind_row_${id}').remove()" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:14px;">✕</button></td>`;
+  tbody.appendChild(row);
+}
+
+function getBlindSKU(width) {
+  if (!width) return 'Enter width';
+  if (width <= 35) return '1001764747 (cut-to-width, ≤35")';
+  if (width <= 47) return '1002083200 (47×48)';
+  if (width <= 54) return '1001764768 (cut-to-width, ≤54")';
+  if (width <= 72) return '1001519939 (72×48)';
+  return 'Measure — order custom';
+}
+
+function updateBlindSKU(input, id) {
+  const sku = getBlindSKU(parseFloat(input.value));
+  const span = document.getElementById('blind_sku_' + id);
+  if (span) span.textContent = sku;
+}
+
+// Init measurements on load
+window.addEventListener('load', function() {
+  calcTileMaterials();
+  addBlindRow('Living Room','','48','1');
+  addBlindRow('Bedroom 1','','48','1');
+  addBlindRow('Bedroom 2','','48','1');
+  addBlindRow('Kitchen','','48','1');
+});
+
+// Initial render
+generateAll();
+</script>
+</body>
+</html>
